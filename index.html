@@ -720,10 +720,10 @@
       const port = list.filter(p => p.category === '포트폴리오').length;
       const social = list.filter(p => p.category === '사회기업').length;
       const managed = list.filter(p => p.category === '관리').length;
-      const items = [['Portfolio', port], ['Social', social], ['Managed', managed], ['Tech Stack', techs]];
+      const items = [['포트폴리오', port], ['사회기업', social], ['관리', managed], ['기술 스택', techs]];
       $('#stats').innerHTML = items.map(([k, v]) => `
-        <div class="rounded-2xl border border-white/10 bg-ink-900/60 px-4 py-3 backdrop-blur-md">
-          <dt class="text-[11px] uppercase tracking-wider text-slate-500">${k}</dt>
+        <div class="rounded-2xl border border-white/10 bg-ink-900/60 px-4 py-3 text-center backdrop-blur-md">
+          <dt class="text-xs font-medium text-slate-400">${k}</dt>
           <dd class="mt-1 text-2xl font-extrabold text-white" data-count="${v}">0</dd>
         </div>`).join('');
       document.querySelectorAll('[data-count]').forEach(el => {
