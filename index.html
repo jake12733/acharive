@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html lang="ko" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Owen's Archive — Project Dashboard</title>
+  <meta name="description" content="Owen Web이 만든 웹사이트 프로젝트와 외주 결과물을 모아둔 아카이브입니다." />
+  <meta property="og:title" content="Owen's Archive" />
+  <meta property="og:description" content="내가 만든 프로젝트와 웹사이트를 모아둔 공간입니다." />
+  <meta name="theme-color" content="#0b131f" />
+
+  <link rel="preconnect" href="https://s0.wp.com" crossorigin />
+  <link rel="preconnect" href="https://jake12733.github.io" crossorigin />
+  <link rel="dns-prefetch" href="https://cdn.tailwindcss.com" />
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Pretendard', 'system-ui', 'sans-serif'] },
+          colors: {
+            ink:   { 950: '#070c14', 900: '#0b131f', 800: '#111b2b', 700: '#1a2638', 600: '#26344a' },
+            flame: { 300: '#ffb27a', 400: '#ff9447', 500: '#ff7a1a', 600: '#e5620a' },
+          },
+          boxShadow: { glow: '0 0 0 1px rgba(255,122,26,.35), 0 20px 50px -20px rgba(255,122,26,.35)' },
+        },
+      },
+    };
+  </script>
+  <style>
+    body { background: #070c14; }
+    .grain::before {
+      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: .05;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+    .card { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease, border-color .3s, box-shadow .3s; }
+    .card.show { opacity: 1; transform: none; }
+    .card:hover .thumb-mark { transform: scale(1.08) rotate(-3deg); }
+    .thumb-mark { transition: transform .5s cubic-bezier(.2,.8,.2,1); }
+    .chip[aria-pressed="true"] { background: #ff7a1a; color: #0b131f; border-color: #ff7a1a; }
+    ::selection { background: #ff7a1a; color: #0b131f; }
+    /* 디바이스 목업 */
+    .mk-laptop { position:absolute; left:7%; top:46px; width:68%; transition:transform .6s cubic-bezier(.2,.8,.2,1); filter:drop-shadow(0 18px 30px rgba(0,0,0,.55)); }
+    .mk-lid { border-radius:8px 8px 0 0; background:#1b2230; padding:0 4px 4px; border:1px solid rgba(255,255,255,.08); }
+    .mk-bar { display:flex; align-items:center; gap:3px; height:13px; padding:0 2px; }
+    .mk-bar i { width:4px; height:4px; border-radius:9999px; background:rgba(255,255,255,.22); }
+    .mk-bar span { flex:1; margin:0 18% 0 8%; height:7px; border-radius:4px; background:rgba(255,255,255,.06); color:rgba(255,255,255,.4); font-size:5px; line-height:7px; text-align:center; overflow:hidden; white-space:nowrap; }
+    .mk-base { height:6px; margin:0 -7%; border-radius:0 0 10px 10px; background:linear-gradient(#2a3242, #151b26); }
+    .mk-phone { position:absolute; right:7%; top:58px; width:21%; border-radius:14px; padding:3px; background:#1b2230; border:1px solid rgba(255,255,255,.1); transition:transform .6s cubic-bezier(.2,.8,.2,1); filter:drop-shadow(0 18px 26px rgba(0,0,0,.6)); }
+    .mk-notch { position:absolute; z-index:3; top:5px; left:50%; width:30%; height:5px; transform:translateX(-50%); border-radius:9999px; background:#000; }
+    .mk-phone-screen { aspect-ratio:390/844; border-radius:11px; }
+    .mk-screen { position:relative; overflow:hidden; background:#0b0f17; }
+    .mk-scale { position:absolute; left:0; top:0; transform-origin:0 0; transform:scale(var(--s, .2)); }
+    .mk-scale iframe { display:block; border:0; background:#0b0f17; pointer-events:none; opacity:0; transition:opacity .6s; }
+    .mk-screen.loaded iframe { opacity:1; }
+    .mk-screen.loaded .mk-skel, .mk-screen.shot .mk-skel { display:none; }
+    .mk-poster { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:top; opacity:0; transition:opacity .35s; }
+    .mk-screen.shot .mk-poster { opacity:1; }
+    .mk-screen.loaded .mk-poster { transition-delay:.6s; opacity:0; }
+    .mk-skel { position:absolute; inset:0; display:flex; flex-direction:column; gap:6%; padding:10% 8%; background:linear-gradient(160deg, color-mix(in srgb, var(--c1) 30%, #0b0f17), #0b0f17); }
+    .mk-skel i { display:block; height:8%; border-radius:4px; background:rgba(255,255,255,.08); animation:mk-shimmer 1.4s ease-in-out infinite; }
+    .mk-skel i:nth-child(1) { width:70%; height:12%; } .mk-skel i:nth-child(2) { width:50%; } .mk-skel i:nth-child(3) { width:30%; }
+    @keyframes mk-shimmer { 50% { opacity:.4; } }
+    .card:hover .mk-laptop { transform:translateY(-4px); }
+    .card:hover .mk-phone { transform:translateY(-8px) rotate(-2deg); }
+    @media (prefers-reduced-motion: reduce) { .card { transition: none; opacity: 1; transform: none; } .mk-skel i { animation:none; } }
+  </style>
+</head>
+<body class="grain font-sans text-slate-200 antialiased min-h-screen">
+
+  <!-- 배경 글로우 -->
+  <div class="pointer-events-none fixed inset-0 -z-0 overflow-hidden" aria-hidden="true">
+    <div class="absolute -top-40 -left-32 h-[480px] w-[480px] rounded-full bg-flame-500/15 blur-[120px]"></div>
+    <div class="absolute top-1/3 -right-40 h-[420px] w-[420px] rounded-full bg-sky-500/10 blur-[120px]"></div>
+  </div>
+
+  <div class="relative z-10">
+    <!-- ================= HEADER ================= -->
+    <header class="sticky top-0 z-30 border-b border-white/5 bg-ink-950/70 backdrop-blur-xl">
+      <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
+        <a href="#" class="flex items-center gap-2.5">
+          <span class="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-flame-400 to-flame-600 text-sm font-black text-ink-900">O</span>
+          <span class="text-base font-bold tracking-tight text-white">Owen<span class="text-flame-400">'</span>s Archive</span>
+        </a>
+        <div class="flex items-center gap-2">
+        <button id="openStudio" type="button" class="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-2 text-sm font-semibold text-slate-200 transition hover:border-flame-400 hover:text-white sm:px-4" aria-label="사이트 만들기">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 4l-4 16"/></svg>
+          <span class="hidden sm:inline">사이트 만들기</span>
+        </button>
+        <button id="openAdd" type="button" class="inline-flex items-center gap-1.5 rounded-full bg-flame-500 px-4 py-2 text-sm font-semibold text-ink-900 transition hover:bg-flame-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-flame-300">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+          <span>프로젝트 추가</span>
+        </button>
+        </div>
+      </nav>
+    </header>
+
+    <!-- HERO -->
+    <section class="mx-auto max-w-6xl px-4 pb-10 pt-16 sm:px-6 sm:pt-24">
+      <p class="mb-4 inline-flex items-center gap-2 rounded-full border border-flame-500/30 bg-flame-500/10 px-3 py-1 text-xs font-semibold tracking-wide text-flame-300">
+        <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-flame-400"></span> PROJECT ARCHIVE · 2026
+      </p>
+      <h1 class="text-4xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-6xl">
+        Owen's <span class="bg-gradient-to-r from-flame-300 via-flame-400 to-flame-600 bg-clip-text text-transparent">Archive</span>
+      </h1>
+      <p class="mt-5 max-w-xl text-base leading-relaxed text-slate-400 sm:text-lg">
+        내가 만든 프로젝트와 웹사이트를 모아둔 공간입니다.<br class="hidden sm:block" />
+        포트폴리오 작업물, 사회적기업 홈페이지, 직접 운영·관리 중인 사이트를 한눈에 살펴보세요.
+      </p>
+
+      <!-- 통계 -->
+      <dl id="stats" class="mt-10 grid max-w-2xl grid-cols-2 gap-3 sm:grid-cols-4"></dl>
+    </section>
+
+    <!-- ================= TOOLBAR ================= -->
+    <section class="mx-auto max-w-6xl px-4 sm:px-6">
+      <div class="flex flex-col gap-4 rounded-2xl border border-white/5 bg-ink-900/60 p-3 sm:flex-row sm:items-center sm:justify-between">
+        <div id="filters" class="flex gap-2 overflow-x-auto pb-1 sm:pb-0" role="group" aria-label="카테고리 필터"></div>
+        <div class="flex items-center gap-2">
+        <button id="exportBtn" type="button" title="추가한 프로젝트를 코드로 복사"
+          class="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/10 text-slate-400 transition hover:border-flame-400 hover:text-white" aria-label="추가한 프로젝트 코드 내보내기">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 3v12m0 0-4-4m4 4 4-4M5 21h14"/></svg>
+        </button>
+        <label class="relative flex-1 sm:w-64">
+          <span class="sr-only">프로젝트 검색</span>
+          <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input id="search" type="search" placeholder="프로젝트, 기술 검색"
+            class="w-full rounded-xl border border-white/10 bg-ink-950/60 py-2.5 pl-9 pr-3 text-sm text-white placeholder:text-slate-500 focus:border-flame-400 focus:outline-none focus:ring-2 focus:ring-flame-500/30" />
+        </label>
+        </div>
+      </div>
+      <div id="slots" class="mt-3 flex gap-2 overflow-x-auto pb-1" role="group" aria-label="업종 슬롯"></div>
+    </section>
+
+    <!-- ================= GRID ================= -->
+    <main class="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      <div id="grid" class="space-y-14"></div>
+      <p id="empty" class="hidden py-20 text-center text-slate-500">조건에 맞는 프로젝트가 없어요.</p>
+    </main>
+
+    <!-- ================= FOOTER ================= -->
+    <footer id="contact" class="mt-10 border-t border-white/5 bg-ink-950/80">
+      <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-6 px-4 py-10 sm:flex-row sm:px-6">
+        <div class="text-center sm:text-left">
+          <p class="text-sm font-semibold text-white">Owen Web</p>
+          <p class="mt-1 text-xs text-slate-500">© <span id="year"></span> Owen's Archive. All rights reserved.</p>
+        </div>
+        <ul class="flex items-center gap-3">
+          <li><a href="https://github.com/jake12733" target="_blank" rel="noopener" aria-label="GitHub" class="social">
+            <svg viewBox="0 0 24 24" class="h-5 w-5" fill="currentColor"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.42c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.25.45-2.28 1.18-3.08-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.62 1.58.23 2.75.11 3.04.74.8 1.18 1.83 1.18 3.08 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></svg>
+          </a></li>
+          <li><a href="https://www.instagram.com/" target="_blank" rel="noopener" aria-label="Instagram" class="social">
+            <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
+          </a></li>
+          <li><a href="https://kmong.com/" target="_blank" rel="noopener" aria-label="크몽" class="social">
+            <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7Z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></svg>
+          </a></li>
+          <li><a href="mailto:hello@owenweb.kr" aria-label="이메일" class="social">
+            <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+          </a></li>
+        </ul>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ================= ADD / EDIT MODAL ================= -->
+  <div id="modal" class="fixed inset-0 z-50 hidden items-end justify-center bg-black/70 p-0 backdrop-blur-sm sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <form id="form" class="max-h-[92vh] w-full overflow-y-auto rounded-t-3xl border border-white/10 bg-ink-900 p-6 shadow-2xl sm:max-w-lg sm:rounded-3xl" novalidate>
+      <div class="mb-5 flex items-center justify-between">
+        <h3 id="modalTitle" class="text-lg font-bold text-white">새 프로젝트 추가</h3>
+        <button type="button" data-close class="grid h-9 w-9 place-items-center rounded-full text-slate-400 hover:bg-white/5 hover:text-white" aria-label="닫기">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+
+      <input type="hidden" name="id" />
+      <div class="space-y-4">
+        <label class="block">
+          <span class="field-label">프로젝트 제목 <b class="text-flame-400">*</b></span>
+          <input name="title" required maxlength="40" class="field" placeholder="예) 오렌지 다이닝" />
+        </label>
+
+        <div class="grid grid-cols-2 gap-3">
+          <label class="block">
+            <span class="field-label">카테고리 <b class="text-flame-400">*</b></span>
+            <select name="category" required class="field">
+              <option value="포트폴리오">포트폴리오</option>
+              <option value="사회기업">사회기업</option>
+              <option value="관리">관리</option>
+            </select>
+          </label>
+          <label class="block">
+            <span class="field-label">연도</span>
+            <input name="year" type="number" min="2000" max="2100" class="field" />
+          </label>
+        </div>
+
+        <label id="slotField" class="block">
+          <span class="field-label">업종 슬롯 <b class="text-flame-400">*</b></span>
+          <select name="slot" class="field"></select>
+        </label>
+
+        <label class="block">
+          <span class="field-label">설명 <b class="text-flame-400">*</b></span>
+          <textarea name="desc" required maxlength="140" rows="3" class="field resize-none" placeholder="어떤 프로젝트인지 한두 문장으로 소개해 주세요."></textarea>
+          <span class="mt-1 block text-right text-[11px] text-slate-500"><span id="descCount">0</span>/140</span>
+        </label>
+
+        <label class="block">
+          <span class="field-label">기술 태그 <span class="text-slate-500">(쉼표로 구분)</span></span>
+          <input name="tags" class="field" placeholder="HTML, Tailwind, JavaScript" />
+        </label>
+
+        <div class="grid gap-3 sm:grid-cols-2">
+          <label class="block">
+            <span class="field-label">웹사이트 URL</span>
+            <input name="live" type="url" class="field" placeholder="https://" />
+          </label>
+          <label class="block">
+            <span class="field-label">소스코드 URL</span>
+            <input name="source" type="url" class="field" placeholder="https://github.com/..." />
+          </label>
+        </div>
+
+        <fieldset>
+          <legend class="field-label">썸네일 컬러</legend>
+          <div id="swatches" class="flex flex-wrap gap-2"></div>
+        </fieldset>
+
+        <p id="formError" class="hidden rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-300"></p>
+      </div>
+
+      <div class="mt-6 flex gap-2">
+        <button type="button" data-close class="flex-1 rounded-xl border border-white/10 py-3 text-sm font-semibold text-slate-300 hover:border-white/30">취소</button>
+        <button type="submit" id="submitBtn" class="flex-1 rounded-xl bg-flame-500 py-3 text-sm font-bold text-ink-900 hover:bg-flame-400">추가하기</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ================= SOURCE VIEWER ================= -->
+  <div id="srcModal" class="fixed inset-0 z-[58] hidden items-center justify-center bg-black/75 p-0 backdrop-blur-sm sm:p-6" role="dialog" aria-modal="true" aria-labelledby="srcTitle">
+    <div class="flex h-full w-full max-w-5xl flex-col overflow-hidden border border-white/10 bg-ink-900 shadow-2xl sm:h-[88vh] sm:rounded-3xl">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-white/5 px-4 py-3 sm:px-5">
+        <div class="flex min-w-0 items-center gap-3">
+          <span class="flex gap-1.5" aria-hidden="true"><i class="h-3 w-3 rounded-full bg-[#ff5f57]"></i><i class="h-3 w-3 rounded-full bg-[#febc2e]"></i><i class="h-3 w-3 rounded-full bg-[#28c840]"></i></span>
+          <div class="min-w-0">
+            <p id="srcTitle" class="truncate font-mono text-sm font-semibold text-white">index.html</p>
+            <p id="srcMeta" class="text-[11px] text-slate-500">Owen's Archive 소스코드</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <button type="button" id="srcCopy" class="rounded-lg border border-white/10 px-3 py-1.5 text-xs font-semibold text-slate-200 hover:border-flame-400 hover:text-white">복사</button>
+          <button type="button" id="srcDown" class="rounded-lg bg-flame-500 px-3 py-1.5 text-xs font-bold text-ink-900 hover:bg-flame-400">다운로드</button>
+          <button type="button" data-src-close class="grid h-8 w-8 place-items-center rounded-full text-slate-400 hover:bg-white/5 hover:text-white" aria-label="닫기">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="relative min-h-0 flex-1 overflow-auto bg-[#0d1117]">
+        <pre class="m-0 flex min-w-max text-[12px] leading-[1.6]"><code id="srcLines" aria-hidden="true" class="sticky left-0 select-none border-r border-white/5 bg-[#0d1117] px-3 py-4 text-right font-mono text-slate-600"></code><code id="srcCode" class="hljs language-html block !bg-transparent px-4 py-4 font-mono"></code></pre>
+        <p id="srcLoading" class="absolute inset-0 grid place-items-center text-sm text-slate-500">코드를 불러오는 중…</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast" class="pointer-events-none fixed bottom-6 left-1/2 z-[60] -translate-x-1/2 translate-y-4 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-ink-900 opacity-0 shadow-xl transition"></div>
+
+  <style>
+    .field-label { display:block; margin-bottom:.375rem; font-size:.8125rem; font-weight:600; color:#cbd5e1; }
+    .field { width:100%; border-radius:.75rem; border:1px solid rgba(255,255,255,.1); background:rgba(7,12,20,.7); padding:.65rem .85rem; font-size:.875rem; color:#fff; transition:border-color .2s, box-shadow .2s; }
+    .field::placeholder { color:#64748b; }
+    .field:focus { outline:none; border-color:#ff9447; box-shadow:0 0 0 3px rgba(255,122,26,.25); }
+    .field.invalid { border-color:#f87171; }
+    .swatch { width:2.25rem; height:2.25rem; border-radius:.75rem; border:2px solid transparent; transition:transform .2s; }
+    .swatch:hover { transform:scale(1.08); }
+    .swatch[aria-checked="true"] { border-color:#fff; box-shadow:0 0 0 3px rgba(255,255,255,.15); }
+    body.modal-open { overflow:hidden; }
+    .icon-btn { display:grid; place-items:center; width:1.75rem; height:1.75rem; border-radius:9999px; background:rgba(7,12,20,.7); color:#fff; backdrop-filter:blur(6px); transition:background .2s; }
+    .icon-btn:hover { background:#ff7a1a; color:#0b131f; }
+    .social { display:grid; place-items:center; width:2.5rem; height:2.5rem; border-radius:9999px; border:1px solid rgba(255,255,255,.1); color:#94a3b8; transition:all .25s; }
+    .social:hover { color:#0b131f; background:#ff7a1a; border-color:#ff7a1a; transform:translateY(-2px); }
+  </style>
+
+  <script>
+    /* =========================================================
+       ✏️ 프로젝트 데이터 — 여기만 수정하면 카드가 자동 생성됩니다.
+       live / source 에 실제 URL을 넣으세요. 비워두면 버튼이 비활성화됩니다.
+       ========================================================= */
+    const PROJECTS = [
+      {
+        title: 'Owen Web',
+        category: '포트폴리오', slot: '템플릿',
+        desc: 'Owen Web 외주 서비스 홍보 사이트. 딥 네이비와 골드 톤으로 패키지 구성과 작업 프로세스를 소개합니다.',
+        tags: ['HTML', 'Tailwind', 'JavaScript'],
+        live: 'https://jake12733.github.io/web-buy/', source: 'https://github.com/jake12733/web-buy',
+        accent: ['#d4af37', '#0b131f'], year: 2026,
+      },
+      {
+        title: "Owen's Archive",
+        category: '포트폴리오', slot: '템플릿',
+        desc: '작업물을 업종별로 모아 보여주는 아카이브 대시보드. 실제 사이트 목업 미리보기와 코드 → GitHub Pages 자동 배포 기능을 갖췄습니다.',
+        tags: ['HTML', 'Tailwind', 'JavaScript', 'GitHub API'],
+        live: 'self', source: 'self',   // 'self' = 이 아카이브 자신 (소스코드는 코드 뷰어로 열림)
+        accent: ['#ff9447', '#e5620a'], year: 2026,
+      },
+      {
+        title: 'THE MEDI Clinic',
+        category: '포트폴리오', slot: '병원·의료',
+        desc: '정형외과·검진·안티에이징 3개 센터를 갖춘 클리닉 랜딩. 히어로 비디오 배경과 예약 폼으로 신뢰감과 전환을 함께 잡았습니다.',
+        tags: ['HTML', 'Tailwind', 'Video BG'],
+        live: 'https://jake12733.github.io/The-Medi/', source: 'https://github.com/jake12733/The-Medi',
+        accent: ['#d97706', '#0f172a'], year: 2026,
+      },
+      {
+        title: '벨루체 호텔',
+        category: '포트폴리오', slot: '호텔·숙박',
+        desc: '호텔 예약 랜딩 페이지. 객실과 부대시설을 감각적으로 보여주고 예약까지 자연스럽게 이어지는 흐름으로 구성했습니다.',
+        tags: ['HTML', 'CSS', 'Motion'],
+        live: 'https://jake12733.github.io/hotel/', source: 'https://github.com/jake12733/hotel',
+        accent: ['#c8a96a', '#1c1917'], year: 2026,
+      },
+      {
+        title: '아르테미스',
+        category: '포트폴리오', slot: '공간·대관',
+        desc: '공간 대관 랜딩 페이지. 공간 소개, 이용 안내, 대관 문의 동선을 한 페이지에 정리했습니다.',
+        tags: ['HTML', 'Tailwind', 'Responsive'],
+        live: 'https://jake12733.github.io/Aretemis9889/', source: 'https://github.com/jake12733/Aretemis9889',
+        accent: ['#a78bfa', '#1e1b4b'], year: 2026,
+      },
+      {
+        title: '결 (Gyeol)',
+        category: '포트폴리오', slot: '건설·인테리어',
+        desc: '인테리어 스튜디오 브랜드 사이트. 여백과 에디토리얼 타이포로 스튜디오의 결을 표현했습니다.',
+        tags: ['HTML', 'CSS', 'Motion'],
+        live: 'https://jake12733.github.io/Gyeol/', source: 'https://github.com/jake12733/Gyeol',
+        accent: ['#d6c7b0', '#3f3a33'], year: 2026,
+      },
+      {
+        title: 'STRATA',
+        category: '포트폴리오', slot: 'IT·스타트업',
+        desc: '테크 SaaS 서비스 사이트. 기능 소개, 요금제, CTA 구조를 SaaS 전환 흐름에 맞춰 설계했습니다.',
+        tags: ['HTML', 'Tailwind', 'JavaScript'],
+        live: 'https://jake12733.github.io/STRATA/', source: 'https://github.com/jake12733/STRATA',
+        accent: ['#60a5fa', '#1e3a8a'], year: 2026,
+      },
+      {
+        title: '광 (Kwang)',
+        category: '포트폴리오', slot: '마트·유통',
+        desc: '30년 경력 장인이 손질하는 한우·숙성육 프리미엄 정육 브랜드 랜딩. 묵직한 다크 톤과 제품 중심 레이아웃으로 구성했습니다.',
+        tags: ['HTML', 'Tailwind', 'Responsive'],
+        live: 'https://jake12733.github.io/kwang/', source: 'https://github.com/jake12733/kwang',
+        accent: ['#b91c1c', '#3f0d0d'], year: 2026,
+      },
+      {
+        title: '오렌지 다이닝',
+        category: '포트폴리오', slot: '외식·카페',
+        desc: '성수 디저트·브런치 카페 사이트. 메뉴, 영업시간, 찾아오는 길을 모바일 중심으로 담았습니다.',
+        tags: ['HTML', 'Tailwind', 'JavaScript'],
+        live: 'https://jake12733.github.io/orange/', source: 'https://github.com/jake12733/orange',
+        accent: ['#ff9447', '#e5620a'], year: 2026,
+      },
+      {
+        title: '우리두리사회적협동조합',
+        category: '사회기업',
+        desc: '경기도 양주시 사회적협동조합 공식 홈페이지. 기관 소개, 사업 안내, 소식 구조를 정리한 실제 운영 사이트입니다.',
+        tags: ['HTML', 'CSS', 'Responsive'],
+        live: 'https://jake12733.github.io/Wooriduri1004/', source: 'https://github.com/jake12733/Wooriduri1004',
+        accent: ['#34d399', '#065f46'], year: 2026,
+      },
+      {
+        title: '게임 클랜 사이트 관리 및 제작',
+        category: '관리',
+        desc: '게임 클랜 운영관리 사이트. 직접 만든 첫 번째 웹사이트로, 멤버 현황과 일정을 한 화면에서 관리합니다.',
+        tags: ['JavaScript', 'LocalStorage', 'Dashboard'],
+        live: 'https://jake12733.github.io/DOKDO-/', source: 'https://github.com/jake12733/DOKDO-',
+        accent: ['#f472b6', '#831843'], year: 2026,
+      },
+      {
+        title: '전자세금계산 사이트',
+        category: '관리',
+        desc: '국세청 표준 규격 전자세금계산서 실시간 작성, 매출·매입 관리대장, 2026 최신 23종 세무계산기와 실무 세무 가이드를 한곳에 모은 세무 포털. 회원가입·로그인과 애드센스를 연동해 운영 중입니다.',
+        tags: ['React', 'Firebase', 'Tailwind', 'AdSense'],
+        live: 'https://jake12733.github.io/ONE-TAX12/', source: 'https://github.com/jake12733/ONE-TAX12',
+        accent: ['#60a5fa', '#1e3a8a'], year: 2026,
+      },
+    ];
+
+    /* 포트폴리오 업종 슬롯 — 순서대로 표시됩니다. 새 업종은 여기에 추가하세요. */
+    const DEVICES = { laptop: [1280, 800], phone: [390, 844] };   // 목업 속 실제 화면 크기(px)
+    const SLOTS = ['건설·인테리어', '병원·의료', '마트·유통', '호텔·숙박', '외식·카페', '공간·대관', 'IT·스타트업', '템플릿'];
+
+    /* ================= 저장소 (이 브라우저에 보관) ================= */
+    const STORE_KEY = 'owens-archive:projects';
+    const PALETTES = [
+      ['#ff9447', '#e5620a'], ['#d4af37', '#0b131f'], ['#60a5fa', '#1e40af'], ['#2dd4bf', '#1e3a8a'],
+      ['#a78bfa', '#312e81'], ['#f472b6', '#831843'], ['#b91c1c', '#3f0d0d'], ['#94a3b8', '#1e293b'],
+    ];
+    const loadCustom = () => { try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; } catch { return []; } };
+    const saveCustom = (list) => { try { localStorage.setItem(STORE_KEY, JSON.stringify(list)); return true; } catch { return false; } };
+    const CATS = ['포트폴리오', '사회기업', '관리'];
+    let custom = loadCustom().map(p => CATS.includes(p.category) ? p : { ...p, category: '포트폴리오' });
+    const SELF_URL = location.href.split('#')[0].split('?')[0];
+    const all = () => [...custom, ...PROJECTS.map(p => p.live === 'self' ? { ...p, live: SELF_URL } : p)];
+
+    /* ================= 렌더링 로직 ================= */
+    const $ = (s) => document.querySelector(s);
+    const grid = $('#grid'), empty = $('#empty'), search = $('#search'), filters = $('#filters');
+    const categories = () => ['전체', ...CATS];
+    let state = { cat: '전체', slot: '전체', q: '' };
+
+    const esc = (s) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+    function btn(href, label, primary) {
+      const base = 'flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-flame-400';
+      const icon = primary
+        ? '<svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></svg>'
+        : '<svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m8 8-4 4 4 4M16 8l4 4-4 4"/></svg>';
+      if (!href) {
+        return `<span class="${base} cursor-not-allowed border border-white/5 text-slate-600" title="준비 중">${icon}${label}</span>`;
+      }
+      const style = primary
+        ? 'bg-flame-500 text-ink-900 hover:bg-flame-400'
+        : 'border border-white/10 text-slate-200 hover:border-flame-400 hover:text-white';
+      if (href === 'self') return `<button type="button" data-viewsrc class="${base} ${style}">${icon}${label}</button>`;
+      return `<a href=""${esc(href)}" target="_blank" rel="noopener" class="${base} ${style}">${icon}${label}</a>`;
+    }
+
+    /* ================= 디바이스 목업 (실제 사이트 자동 스크롤) ================= */
+    /* 즉시 보이는 스크린샷 (실제 사이트가 준비되기 전까지 표시)
+       · PROJECTS에 poster / posterMobile 이미지 경로를 넣으면 그 이미지를 우선 사용
+       · 없으면 공개 스크린샷 서비스(WordPress mShots)로 자동 생성 — 한 번 만들어지면 캐시돼서 바로 뜸 */
+    function shotUrl(url, [w, h]) {
+      if (!/^https:\/\//.test(url) || url.startsWith(SELF_URL + '#')) return '';
+      const out = w > 600 ? [640, 400] : [w, h];
+      return `https://s0.wp.com/mshots/v1/${encodeURIComponent(url)}?w=${out[0]}&h=${out[1]}&vpw=${w}&vph=${h}`;
+    }
+    function posterLoaded(img) {
+      const box = img.closest('.mk-screen'), want = +img.dataset.want || 0;
+      // 아직 생성 중이면 서비스가 임시 이미지를 보내므로(크기가 다름) 잠시 뒤 다시 요청
+      if (want && img.naturalWidth && Math.abs(img.naturalWidth - want) > 4) {
+        const n = +(img.dataset.retry || 0);
+        if (n < 4) { img.dataset.retry = n + 1; setTimeout(() => { img.src = img.src.replace(/&r=\d+$/, '') + '&r=' + Date.now(); }, 3500 + n * 2500); }
+        return;
+      }
+      box?.classList.add('shot');
+    }
+
+    function screen(url, [w, h], cls, poster) {
+      const src = poster || shotUrl(url, [w, h]);
+      const want = poster ? 0 : (w > 600 ? 640 : w);
+      return `
+        <div class="mk-screen ${cls}" data-w="${w}">
+          <div class="mk-skel"><i></i><i></i><i></i></div>
+          ${src ? `<img class="mk-poster" src="${esc(src)}" data-want="${want}" alt="" decoding="async" fetchpriority="high"
+            onload="posterLoaded(this)" onerror="this.remove()">` : ''}
+          <div class="mk-scale" style="width:${w}px;height:${h}px">
+            <iframe data-src="${esc(url)}" title="" tabindex="-1" aria-hidden="true" scrolling="no"
+              sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer" style="width:${w}px;height:${h}px"></iframe>
+          </div>
+        </div>`;
+    }
+
+    function mockup(p) {
+      const [c1] = p.accent;
+      let host = p.live;
+      try { const u = new URL(p.live); host = u.host + u.pathname.replace(/\/$/, ''); } catch {}
+      return `
+        <div class="mk relative h-60 overflow-hidden" style="--c1:${c1}">
+          <div class="absolute inset-0" style="background:radial-gradient(120% 90% at 20% 0%, ${c1}55, transparent 60%), radial-gradient(80% 80% at 100% 100%, ${c1}22, transparent 60%), #080d16"></div>
+          <div class="mk-laptop">
+            <div class="mk-lid">
+              <div class="mk-bar"><i></i><i></i><i></i><span>${esc(host)}</span></div>
+              ${screen(p.live, DEVICES.laptop, 'aspect-[16/10]', p.poster)}
+            </div>
+            <div class="mk-base"></div>
+          </div>
+          <div class="mk-phone">
+            <span class="mk-notch"></span>
+            ${screen(p.live, DEVICES.phone, 'mk-phone-screen', p.posterMobile)}
+          </div>`;
+    }
+
+    function card(p, i) {
+      const [c1, c2] = p.accent;
+      return `
+      <article class="card group flex flex-col overflow-hidden rounded-2xl border border-white/[.06] bg-ink-900/80 hover:border-flame-500/40 hover:shadow-glow" style="transition-delay:${i * 60}ms">
+        ${p.live ? mockup(p) : `
+        <div class="relative h-60 overflow-hidden" style="background:linear-gradient(135deg, ${c1}, ${c2})">
+          <div class="absolute inset-0 opacity-30" style="background-image:radial-gradient(rgba(255,255,255,.35) 1px, transparent 1px);background-size:14px 14px"></div>
+          <span class="thumb-mark absolute -bottom-6 right-3 select-none text-[120px] font-black leading-none text-white/20">${esc(p.title.charAt(0))}</span>`}
+          <span class="absolute left-4 top-4 rounded-full bg-ink-950/70 px-3 py-1 text-[11px] font-semibold tracking-wide text-white backdrop-blur">${esc(p.slot || p.category)}</span>
+          ${p.id ? `
+          <div class="absolute right-3 top-3 flex gap-1.5">
+            <span class="rounded-full bg-flame-500 px-2 py-0.5 text-[10px] font-bold text-ink-900">NEW</span>
+            <button type="button" data-edit="${p.id}" class="icon-btn" aria-label="${esc(p.title)} 수정">
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4Z"/></svg>
+            </button>
+            <button type="button" data-del="${p.id}" class="icon-btn hover:!bg-red-500" aria-label="${esc(p.title)} 삭제">
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13"/></svg>
+            </button>
+          </div>` : `<span class="absolute right-4 top-4 text-[11px] font-medium text-white/70">${esc(p.year || '')}</span>`}
+        </div>
+        <div class="flex flex-1 flex-col p-5">
+          <h2 class="text-lg font-bold tracking-tight text-white">${esc(p.title)}</h2>
+          <p class="mt-2 flex-1 text-sm leading-relaxed text-slate-400">${esc(p.desc)}</p>
+          <ul class="mt-4 flex flex-wrap gap-1.5">
+            ${p.tags.map(t => `<li class="rounded-md border border-white/10 bg-white/[.03] px-2 py-0.5 text-[11px] font-medium text-slate-300">${esc(t)}</li>`).join('')}
+          </ul>
+          <div class="mt-5 flex gap-2">
+            ${btn(p.live, '웹사이트 바로가기', true)}
+            ${btn(p.source, '소스코드', false)}
+          </div>
+        </div>
+      </article>`;
+    }
+
+    function addCard(slot) {
+      return `
+      <button type="button" data-addslot="${esc(slot)}"
+        class="group flex min-h-[280px] flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-white/10 bg-white/[.015] text-slate-500 transition hover:border-flame-400/60 hover:bg-flame-500/[.04] hover:text-flame-300">
+        <span class="grid h-12 w-12 place-items-center rounded-full border border-current transition group-hover:scale-110">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        </span>
+        <span class="text-sm font-semibold">${esc(slot)} 프로젝트 추가</span>
+        <span class="text-xs opacity-70">아직 등록된 작업물이 없어요</span>
+      </button>`;
+    }
+
+    function section(eyebrow, title, items, slot, start) {
+      const cards = items.map((p, i) => card(p, start + i)).join('');
+      return `
+      <section>
+        <div class="mb-5 flex items-end justify-between gap-4 border-b border-white/5 pb-3">
+          <div>
+            <p class="text-[11px] font-semibold uppercase tracking-[.2em] text-flame-400/80">${eyebrow}</p>
+            <h3 class="mt-1 text-xl font-bold tracking-tight text-white">${esc(title)}</h3>
+          </div>
+          <div class="flex shrink-0 items-center gap-2">
+            <span class="text-sm text-slate-500">${items.length}개</span>
+            ${slot ? `<button type="button" data-addslot="${esc(slot)}" class="grid h-7 w-7 place-items-center rounded-full border border-white/10 text-slate-400 transition hover:border-flame-400 hover:text-flame-300" aria-label="${esc(slot)}에 프로젝트 추가">
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>` : ''}
+          </div>
+        </div>
+        <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">${cards}${!items.length && slot ? addCard(slot) : ''}</div>
+      </section>`;
+    }
+
+    function render() {
+      const q = state.q.trim().toLowerCase();
+      const match = p => !q || [p.title, p.desc, p.category, p.slot || '', ...p.tags].join(' ').toLowerCase().includes(q);
+      const port = all().filter(p => p.category === '포트폴리오' && match(p));
+      const soc = all().filter(p => p.category === '사회기업' && match(p));
+      const mng = all().filter(p => p.category === '관리' && match(p));
+      let html = '', n = 0;
+      const show = (c) => state.cat === '전체' || state.cat === c;
+
+      if (show('포트폴리오')) {
+        const slots = state.slot === '전체' ? SLOTS : [state.slot];
+        slots.forEach(s => {
+          const items = port.filter(p => p.slot === s);
+          if (!items.length && (q || state.cat === '전체')) return;   // 빈 슬롯은 포트폴리오 탭에서만 노출
+          html += section('Portfolio', s, items, s, n); n += items.length;
+        });
+        const etc = port.filter(p => !SLOTS.includes(p.slot));
+        if (etc.length && state.slot === '전체') { html += section('Portfolio', '기타', etc, null, n); n += etc.length; }
+      }
+      if (show('사회기업') && soc.length) { html += section('Social', '사회적기업 · 협동조합', soc, null, n); n += soc.length; }
+      if (show('관리') && mng.length) html += section('Managed', '관리 중인 사이트', mng, null, n);
+
+      grid.innerHTML = html;
+      empty.classList.toggle('hidden', !!html);
+      requestAnimationFrame(() => grid.querySelectorAll('.card').forEach(el => el.classList.add('show')));
+      fitMockups(); watchMockups();
+    }
+
+    function fitMockups() {
+      grid.querySelectorAll('.mk-screen').forEach(s => s.style.setProperty('--s', s.clientWidth / +s.dataset.w));
+    }
+
+    /* 목업 안 사이트를 실제 기기 크기로 띄우고, 사이트 안에서 진짜로 자동 스크롤
+       → 100vh 히어로·스크롤 등장 애니메이션·모바일 레이아웃이 실제와 똑같이 보임 */
+    const AUTOSCROLL = `<style>html{scrollbar-width:none!important;scroll-behavior:auto!important}::-webkit-scrollbar{display:none!important}</style>
+<script>(function(){
+  var y=0,dir=1,hold=0,last=0,paused=false;
+  addEventListener('message',function(e){ if(e.data&&e.data.mk) paused=(e.data.mk==='pause'); });
+  function step(t){
+    requestAnimationFrame(step);
+    var dt=last?Math.min(t-last,100):0; last=t;
+    if(paused||t<hold) return;
+    var se=document.scrollingElement||document.documentElement, max=se.scrollHeight-innerHeight;
+    if(max<=4) return;
+    var speed=Math.max(140,max/16)*(dir<0?2.6:1);
+    y+=dir*speed*dt/1000;
+    if(y>=max){ y=max; dir=-1; hold=t+1800; } else if(y<=0){ y=0; dir=1; hold=t+2500; }
+    try{ scrollTo({top:y,behavior:'instant'}); }catch(_){ se.scrollTop=y; }
+  }
+  addEventListener('load',function(){ hold=performance.now()+2000; requestAnimationFrame(step); });
+})();<\/script>`;
+
+    const htmlCache = new Map();
+    function fetchSite(url) {
+      if (htmlCache.has(url)) return htmlCache.get(url);
+      const base = location.href.split('#')[0];
+      let job;
+      if (url.startsWith(base + '#/s/') && window.__siteHtml) {                 // Site Studio로 만든 사이트
+        job = window.__siteHtml(decodeURIComponent(url.slice(base.length + 4))).then(html => html && { html, base: null });
+      } else {                                                                  // 배포된 사이트 (GitHub Pages는 CORS 허용)
+        job = fetch(url, { mode: 'cors', cache: 'force-cache' })
+          .then(r => r.ok && /html/.test(r.headers.get('content-type') || 'text/html') ? r.text() : null)
+          .then(html => html && { html, base: r2abs(url) });
+      }
+      job = job.catch(() => null);
+      htmlCache.set(url, job);
+      return job;
+    }
+    const r2abs = (u) => { try { return new URL(u, location.href).href; } catch { return u; } };
+
+    function inject(html, base) {
+      const head = (base ? `<base href="${esc(base)}">` : '') + AUTOSCROLL;
+      if (/<head[^>]*>/i.test(html)) return html.replace(/<head[^>]*>/i, m => m + head);
+      if (/<html[^>]*>/i.test(html)) return html.replace(/<html[^>]*>/i, m => m + '<head>' + head + '</head>');
+      return head + html;
+    }
+
+    async function loadFrame(f) {
+      const url = f.dataset.src; f.removeAttribute('data-src');
+      const shown = new Promise(res => {
+        const reveal = () => { f.closest('.mk-screen')?.classList.add('loaded'); res(); };
+        f.addEventListener('load', () => setTimeout(reveal, 500), { once: true });
+        setTimeout(reveal, 9000);                        // 로딩이 아주 느린 사이트도 결국 표시
+      });
+      const site = await fetchSite(url);
+      if (!f.isConnected) return;
+      if (site) f.srcdoc = inject(site.html, site.base);
+      else { f.removeAttribute('sandbox'); f.setAttribute('sandbox', 'allow-scripts allow-same-origin'); f.src = url; }   // 못 읽으면 첫 화면만 표시
+      return shown;
+    }
+
+    /* 화면 밖이어도 위에서부터 차례로 모두 미리 로딩 (동시에 3개씩) */
+    let queue = [], running = 0;
+    function pump() {
+      while (running < 4 && queue.length) {
+        const mk = queue.shift();
+        if (!mk.isConnected) continue;
+        running++;
+        Promise.all([...mk.querySelectorAll('iframe[data-src]')].map(loadFrame)).finally(() => { running--; pump(); });
+      }
+    }
+    const io = 'IntersectionObserver' in window ? new IntersectionObserver(entries => {
+      entries.forEach(en => en.target.querySelectorAll('iframe').forEach(f => {
+        try { f.contentWindow?.postMessage({ mk: en.isIntersecting ? 'play' : 'pause' }, '*'); } catch {}
+      }));
+    }) : null;
+
+    let IN_FRAME = true;
+    try { IN_FRAME = window.self !== window.top; } catch {}
+
+    function watchMockups() {
+      if (IN_FRAME) return;   // 아카이브가 목업 안에 들어가 있을 땐 그 안의 목업은 불러오지 않음
+      const start = () => {
+        queue = [...grid.querySelectorAll('.mk')];
+        queue.forEach(m => io?.observe(m));
+        pump();
+      };
+      document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', start, { once: true }) : setTimeout(start, 0);
+    }
+
+    let fitTimer;
+    window.addEventListener('resize', () => { clearTimeout(fitTimer); fitTimer = setTimeout(fitMockups, 120); });
+
+    function renderSlots() {
+      const box = $('#slots');
+      box.classList.toggle('hidden', state.cat !== '포트폴리오');
+      if (state.cat !== '포트폴리오') return;
+      const port = all().filter(p => p.category === '포트폴리오');
+      box.innerHTML = ['전체', ...SLOTS].map(s => {
+        const n = s === '전체' ? port.length : port.filter(p => p.slot === s).length;
+        return `<button type="button" data-slot="${esc(s)}" aria-pressed="${s === state.slot}"
+          class="chip shrink-0 rounded-lg border border-white/10 px-3 py-1.5 text-xs font-medium ${n ? 'text-slate-300' : 'text-slate-600'} transition hover:border-flame-400 hover:text-white">
+          ${esc(s)} <span class="ml-0.5 opacity-60">${n}</span></button>`;
+      }).join('');
+    }
+
+    function renderFilters() {
+      const cats = categories();
+      if (!cats.includes(state.cat)) state.cat = '전체';
+      filters.innerHTML = cats.map(c => {
+        const n = c === '전체' ? all().length : all().filter(p => p.category === c).length;
+        return `<button type="button" data-cat="${esc(c)}" aria-pressed="${c === state.cat}"
+          class="chip shrink-0 rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-slate-300 transition hover:border-flame-400 hover:text-white">
+          ${esc(c)} <span class="ml-1 opacity-60">${n}</span></button>`;
+      }).join('');
+    }
+
+    function renderStats() {
+      const list = all();
+      const techs = new Set(list.flatMap(p => p.tags)).size;
+      const port = list.filter(p => p.category === '포트폴리오').length;
+      const social = list.filter(p => p.category === '사회기업').length;
+      const managed = list.filter(p => p.category === '관리').length;
+      const items = [['Portfolio', port], ['Social', social], ['Managed', managed], ['Tech Stack', techs]];
+      $('#stats').innerHTML = items.map(([k, v]) => `
+        <div class="rounded-2xl border border-white/5 bg-ink-900/60 px-4 py-3">
+          <dt class="text-[11px] uppercase tracking-wider text-slate-500">${k}</dt>
+          <dd class="mt-1 text-2xl font-extrabold text-white" data-count="${v}">0</dd>
+        </div>`).join('');
+      document.querySelectorAll('[data-count]').forEach(el => {
+        const target = +el.dataset.count; let n = 0;
+        if (!target) { el.textContent = 0; return; }
+        const step = () => { n++; el.textContent = n; if (n < target) setTimeout(step, 600 / target); };
+        step();
+      });
+    }
+
+    const refresh = () => { renderStats(); renderFilters(); renderSlots(); render(); };
+
+    /* ================= 토스트 ================= */
+    let toastTimer;
+    function toast(msg) {
+      const t = $('#toast'); t.textContent = msg;
+      t.classList.remove('opacity-0', 'translate-y-4');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.add('opacity-0', 'translate-y-4'), 2200);
+    }
+
+    /* ================= 모달 / 폼 ================= */
+    const modal = $('#modal'), form = $('#form'), err = $('#formError');
+    form.slot.innerHTML = SLOTS.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join('');
+    const syncSlot = () => $('#slotField').classList.toggle('hidden', form.category.value !== '포트폴리오');
+    form.category.addEventListener('change', syncSlot);
+    let palette = 0, lastFocus = null;
+
+    function renderSwatches() {
+      $('#swatches').innerHTML = PALETTES.map(([a, b], i) => `
+        <button type="button" role="radio" aria-checked="${i === palette}" aria-label="컬러 ${i + 1}" data-sw="${i}"
+          class="swatch" style="background:linear-gradient(135deg, ${a}, ${b})"></button>`).join('');
+    }
+
+    function openModal(project, presetSlot) {
+      lastFocus = document.activeElement;
+      form.reset(); err.classList.add('hidden');
+      form.querySelectorAll('.invalid').forEach(el => el.classList.remove('invalid'));
+      const editing = !!project;
+      $('#modalTitle').textContent = editing ? '프로젝트 수정' : '새 프로젝트 추가';
+      $('#submitBtn').textContent = editing ? '저장하기' : '추가하기';
+      form.id.value = editing ? project.id : '';
+      form.year.value = editing ? (project.year || '') : new Date().getFullYear();
+      if (editing) {
+        ['title', 'category', 'desc', 'live', 'source'].forEach(k => form[k].value = project[k] || '');
+        form.tags.value = project.tags.join(', ');
+        form.slot.value = SLOTS.includes(project.slot) ? project.slot : SLOTS[0];
+        palette = Math.max(0, PALETTES.findIndex(p => p[0] === project.accent[0]));
+      } else {
+        palette = 0;
+        form.category.value = presetSlot || state.cat === '전체' ? '포트폴리오' : state.cat;
+        form.slot.value = presetSlot || (SLOTS.includes(state.slot) ? state.slot : SLOTS[0]);
+      }
+      syncSlot();
+      $('#descCount').textContent = form.desc.value.length;
+      renderSwatches();
+      modal.classList.remove('hidden'); modal.classList.add('flex');
+      document.body.classList.add('modal-open');
+      setTimeout(() => form.title.focus(), 50);
+    }
+
+    function closeModal() {
+      modal.classList.add('hidden'); modal.classList.remove('flex');
+      document.body.classList.remove('modal-open');
+      lastFocus?.focus();
+    }
+
+    const isUrl = (v) => !v || /^https?:\/\/\S+\.\S+/.test(v);
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      form.querySelectorAll('.invalid').forEach(el => el.classList.remove('invalid'));
+      const v = Object.fromEntries(new FormData(form));
+      const bad = [];
+      ['title', 'category', 'desc'].forEach(k => { if (!v[k].trim()) bad.push(k); });
+      ['live', 'source'].forEach(k => { if (!isUrl(v[k].trim())) bad.push(k); });
+      if (bad.length) {
+        bad.forEach(k => form[k].classList.add('invalid'));
+        err.textContent = bad.some(k => k === 'live' || k === 'source')
+          ? 'URL은 https:// 로 시작하는 주소로 입력해 주세요.' : '필수 항목을 채워 주세요.';
+        err.classList.remove('hidden');
+        form[bad[0]].focus();
+        return;
+      }
+      const project = {
+        id: v.id || 'p' + Date.now().toString(36),
+        title: v.title.trim(),
+        category: v.category.trim(),
+        slot: v.category === '포트폴리오' ? v.slot : '',
+        desc: v.desc.trim(),
+        tags: v.tags.split(',').map(t => t.trim()).filter(Boolean).slice(0, 6),
+        live: v.live.trim(), source: v.source.trim(),
+        accent: PALETTES[palette],
+        year: Number(v.year) || new Date().getFullYear(),
+      };
+      custom = v.id ? custom.map(p => p.id === v.id ? project : p) : [project, ...custom];
+      const ok = saveCustom(custom);
+      closeModal(); refresh();
+      toast(ok ? (v.id ? '수정되었어요' : '프로젝트가 추가되었어요') : '저장 공간에 접근할 수 없어 새로고침 시 사라져요');
+    });
+
+    form.desc.addEventListener('input', () => $('#descCount').textContent = form.desc.value.length);
+    $('#swatches').addEventListener('click', e => {
+      const b = e.target.closest('[data-sw]'); if (!b) return;
+      palette = +b.dataset.sw; renderSwatches();
+    });
+    $('#openAdd').addEventListener('click', () => openModal());
+    modal.addEventListener('click', e => { if (e.target === modal || e.target.closest('[data-close]')) closeModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeModal(); });
+
+    /* ================= 소스코드 뷰어 (아카이브 자신의 코드) ================= */
+    const srcModal = $('#srcModal');
+    let srcText = null;
+    const loadScript = (src) => new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
+    async function getOwnSource() {
+      if (srcText) return srcText;
+      const r = await fetch(SELF_URL, { cache: 'no-cache' });
+      if (!r.ok) throw new Error(r.status);
+      return (srcText = await r.text());
+    }
+    async function openSource() {
+      srcModal.classList.remove('hidden'); srcModal.classList.add('flex');
+      document.body.classList.add('modal-open');
+      $('#srcLoading').classList.remove('hidden');
+      try {
+        const code = await getOwnSource();
+        const lines = code.split('\n').length;
+        $('#srcMeta').textContent = `Owen's Archive 소스코드 · ${lines.toLocaleString()}줄 · ${(new Blob([code]).size / 1024).toFixed(1)} KB`;
+        $('#srcLines').textContent = Array.from({ length: lines }, (_, i) => i + 1).join('\n');
+        const el = $('#srcCode'); el.textContent = code;
+        $('#srcLoading').classList.add('hidden');
+        try {
+          if (!window.hljs) {
+            document.head.insertAdjacentHTML('beforeend', '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">');
+            await loadScript('https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js');
+          }
+          if (!el.dataset.highlighted) window.hljs.highlightElement(el);
+        } catch {}   // 색상 강조를 못 불러와도 코드는 그대로 보임
+      } catch {
+        $('#srcLoading').textContent = '이 화면에서는 원본 코드를 읽을 수 없어요. GitHub Pages 등 배포된 주소에서 열면 보여요.';
+      }
+    }
+    function closeSource() {
+      srcModal.classList.add('hidden'); srcModal.classList.remove('flex');
+      document.body.classList.remove('modal-open');
+    }
+    srcModal.addEventListener('click', e => { if (e.target === srcModal || e.target.closest('[data-src-close]')) closeSource(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !srcModal.classList.contains('hidden')) closeSource(); });
+    $('#srcCopy').addEventListener('click', async () => {
+      if (!srcText) return;
+      try { await navigator.clipboard.writeText(srcText); toast('소스코드를 복사했어요'); }
+      catch { toast('복사가 막혀 있어요. 다운로드를 이용해 주세요'); }
+    });
+    $('#srcDown').addEventListener('click', () => {
+      if (!srcText) return;
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([srcText], { type: 'text/html' }));
+      a.download = 'index.html'; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    });
+
+    /* 카드 수정 / 삭제 */
+    grid.addEventListener('click', e => {
+      if (e.target.closest('[data-viewsrc]')) return openSource();
+      const ed = e.target.closest('[data-edit]'), del = e.target.closest('[data-del]'), add = e.target.closest('[data-addslot]');
+      if (add) openModal(null, add.dataset.addslot);
+      if (ed) openModal(custom.find(p => p.id === ed.dataset.edit));
+      if (del) {
+        const p = custom.find(x => x.id === del.dataset.del);
+        if (p && confirm(`'${p.title}' 프로젝트를 삭제할까요?`)) {
+          custom = custom.filter(x => x.id !== p.id); saveCustom(custom); refresh(); toast('삭제되었어요');
+        }
+      }
+    });
+
+    /* 내보내기: 추가한 프로젝트를 PROJECTS 배열에 붙여넣을 코드로 복사 */
+    $('#exportBtn').addEventListener('click', async () => {
+      if (!custom.length) return toast('추가한 프로젝트가 없어요');
+      const code = custom.map(({ id, ...p }) => '      ' + JSON.stringify(p) + ',').join('\n');
+      try { await navigator.clipboard.writeText(code); toast(`${custom.length}개 프로젝트 코드가 복사되었어요`); }
+      catch { prompt('아래 코드를 복사해 PROJECTS 배열에 붙여넣으세요', code); }
+    });
+
+    filters.addEventListener('click', e => {
+      const b = e.target.closest('button[data-cat]'); if (!b) return;
+      state.cat = b.dataset.cat; state.slot = '전체'; renderFilters(); renderSlots(); render();
+    });
+    $('#slots').addEventListener('click', e => {
+      const b = e.target.closest('button[data-slot]'); if (!b) return;
+      state.slot = b.dataset.slot; renderSlots(); render();
+    });
+    let searchTimer;
+    search.addEventListener('input', e => { state.q = e.target.value; clearTimeout(searchTimer); searchTimer = setTimeout(render, 250); });
+
+    $('#year').textContent = new Date().getFullYear();
+    if (/^#\/s\//.test(location.hash)) window.__deferRefresh = true;   // 사이트 주소로 바로 열면 아카이브는 나중에 그림
+    else refresh();
+  </script>
+
+  <!-- ================= SITE STUDIO ================= -->
+  <div id="studio" class="fixed inset-0 z-[55] hidden flex-col bg-ink-950" role="dialog" aria-modal="true" aria-labelledby="studioTitle">
+    <div class="flex items-center justify-between gap-3 border-b border-white/5 px-4 py-3 sm:px-6">
+      <div class="flex min-w-0 items-center gap-3">
+        <span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-flame-500/15 text-flame-300">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 4l-4 16"/></svg>
+        </span>
+        <div class="min-w-0">
+          <p id="studioTitle" class="text-sm font-bold text-white">Site Studio</p>
+          <p class="truncate text-xs text-slate-500">코드나 index.html을 넣고 이름을 붙이면 나만의 사이트로 열려요</p>
+        </div>
+      </div>
+      <button type="button" data-studio-close class="grid h-9 w-9 shrink-0 place-items-center rounded-full text-slate-400 hover:bg-white/5 hover:text-white" aria-label="닫기">
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+
+    <div class="grid min-h-0 flex-1 overflow-y-auto lg:grid-cols-[460px_1fr] lg:overflow-hidden">
+      <form id="studioForm" class="space-y-5 border-white/5 p-4 sm:p-6 lg:min-h-0 lg:overflow-y-auto lg:border-r" novalidate>
+        <div>
+          <div class="mb-2 flex items-center justify-between">
+            <span class="field-label !mb-0">내 사이트</span>
+            <button type="button" id="newSite" class="text-xs font-semibold text-flame-300 hover:text-flame-400">+ 새로 만들기</button>
+          </div>
+          <div id="siteList" class="flex flex-wrap gap-2"></div>
+        </div>
+
+        <label class="block">
+          <span class="field-label">사이트 이름 <b class="text-flame-400">*</b></span>
+          <div class="flex items-center rounded-xl border border-white/10 bg-ink-950/70 transition focus-within:border-flame-400 focus-within:ring-2 focus-within:ring-flame-500/25" id="nameBox">
+            <span class="shrink-0 pl-3 text-xs text-slate-500">/s/</span>
+            <input name="name" maxlength="60" autocomplete="off" spellcheck="false" class="min-w-0 flex-1 bg-transparent px-1 py-2.5 pr-3 text-sm text-white placeholder:text-slate-500 focus:outline-none" placeholder="성수-카페 또는 my-cafe" />
+          </div>
+          <span class="mt-1 block text-[11px] text-slate-500">한글·영문·숫자·하이픈(-) 모두 가능 · 입력한 이름 그대로 주소가 됩니다</span>
+        </label>
+
+        <label class="block">
+          <span class="field-label">GitHub 배포 주소 <span class="font-normal text-slate-500">(영문만 가능 · 자동 추천)</span></span>
+          <div class="flex items-center rounded-xl border border-white/10 bg-ink-950/70 transition focus-within:border-flame-400 focus-within:ring-2 focus-within:ring-flame-500/25" id="repoBox">
+            <span id="repoPrefix" class="shrink-0 pl-3 text-xs text-slate-500">github.io/</span>
+            <input name="repo" maxlength="100" autocomplete="off" spellcheck="false" class="min-w-0 flex-1 bg-transparent px-1 py-2.5 pr-3 text-sm text-white placeholder:text-slate-500 focus:outline-none" placeholder="seongsu-kape" />
+          </div>
+          <span class="mt-1 block text-[11px] text-slate-500">GitHub 저장소 이름은 한글을 쓸 수 없어서 한글 이름은 로마자로 바꿔 추천해요. 원하는 영문으로 고쳐도 돼요.</span>
+        </label>
+
+        <label class="block">
+          <span class="field-label">표시 이름</span>
+          <input name="title" maxlength="40" class="field" placeholder="예) 성수 카페 리뉴얼" />
+        </label>
+
+        <div>
+          <div class="mb-2 grid grid-cols-2 gap-1 rounded-xl bg-white/[.03] p-1" role="tablist">
+            <button type="button" role="tab" data-src-tab="code" aria-selected="true" class="srctab">코드 붙여넣기</button>
+            <button type="button" role="tab" data-src-tab="file" aria-selected="false" class="srctab">파일 업로드</button>
+          </div>
+          <div data-src-panel="code">
+            <textarea name="code" spellcheck="false" wrap="off" class="field h-72 resize-y font-mono text-xs leading-relaxed" placeholder="<!DOCTYPE html>&#10;<html lang=&quot;ko&quot;>&#10;  ..."></textarea>
+            <div class="mt-1 flex justify-between text-[11px] text-slate-500"><span id="codeSize">0 KB</span><span>입력하면 미리보기에 바로 반영돼요</span></div>
+          </div>
+          <div data-src-panel="file" class="hidden">
+            <label id="drop" class="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-white/15 px-4 py-10 text-center transition hover:border-flame-400/60 hover:bg-flame-500/[.04]">
+              <svg class="h-7 w-7 text-flame-300" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 16V4m0 0-4 4m4-4 4 4M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+              <span class="text-sm font-semibold text-slate-200">index.html을 끌어다 놓거나 클릭</span>
+              <span class="text-xs text-slate-500">CSS·JS·이미지 파일도 같이 올리면 하나로 합쳐 드려요</span>
+              <input id="fileInput" type="file" multiple accept=".html,.htm,.css,.js,image/*" class="sr-only" />
+            </label>
+            <ul id="fileList" class="mt-3 space-y-1 text-xs text-slate-400"></ul>
+          </div>
+        </div>
+
+        <fieldset class="space-y-3 rounded-2xl border border-white/5 p-4">
+          <label class="flex items-center gap-2 text-sm font-medium text-slate-200">
+            <input type="checkbox" name="addCard" checked class="h-4 w-4 accent-[#ff7a1a]" /> 아카이브 카드로 추가
+          </label>
+          <div id="cardOpts" class="grid grid-cols-2 gap-3">
+            <select name="sCategory" class="field"><option value="포트폴리오">포트폴리오</option><option value="사회기업">사회기업</option>
+              <option value="관리">관리</option></select>
+            <select name="sSlot" class="field"></select>
+            <input name="sDesc" maxlength="140" class="field col-span-2" placeholder="카드에 보일 한 줄 설명" />
+          </div>
+        </fieldset>
+
+        <p id="studioError" class="hidden rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-300"></p>
+
+        <div class="grid grid-cols-2 gap-2">
+          <button type="submit" class="rounded-xl bg-flame-500 py-3 text-sm font-bold text-ink-900 hover:bg-flame-400">저장하고 열기</button>
+          <button type="button" id="deployBtn" class="inline-flex items-center justify-center gap-1.5 rounded-xl border border-white/10 py-3 text-sm font-semibold text-slate-200 hover:border-flame-400 hover:text-white">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.42c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.25.45-2.28 1.18-3.08-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.62 1.58.23 2.75.11 3.04.74.8 1.18 1.83 1.18 3.08 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></svg>
+            GitHub Pages 배포
+          </button>
+        </div>
+
+        <ol id="deployLog" class="hidden space-y-1.5 rounded-2xl bg-white/[.03] p-4 text-xs"></ol>
+
+        <details id="ghBox" class="group rounded-2xl border border-white/5 p-4">
+          <summary class="flex cursor-pointer list-none items-center justify-between text-sm font-semibold text-slate-200">
+            <span>GitHub 연결 설정</span><span id="ghState" class="text-xs font-medium text-slate-500"></span>
+          </summary>
+          <!-- 최초 1회 설정 -->
+          <div id="ghSetup" class="mt-4 space-y-3">
+            <label class="block"><span class="field-label">GitHub 사용자명</span><input name="ghUser" class="field" placeholder="jake12733" autocomplete="off" /></label>
+            <label class="block"><span class="field-label">Personal Access Token <span class="font-normal text-slate-500">(처음 한 번만)</span></span><input name="ghToken" type="password" class="field" placeholder="github_pat_..." autocomplete="off" /></label>
+            <div class="grid grid-cols-2 gap-3">
+              <label class="block"><span class="field-label">내 PIN <span class="font-normal text-slate-500">(4~6자리)</span></span><input name="ghPin" type="password" inputmode="numeric" maxlength="6" autocomplete="new-password" class="field tracking-[.3em]" placeholder="••••" /></label>
+              <label class="block"><span class="field-label">PIN 확인</span><input name="ghPin2" type="password" inputmode="numeric" maxlength="6" autocomplete="new-password" class="field tracking-[.3em]" placeholder="••••" /></label>
+            </div>
+            <p class="text-[11px] leading-relaxed text-slate-500">토큰은 태현님이 정한 PIN으로 <b class="text-slate-300">암호화</b>돼서 이 브라우저에만 저장돼요. 다음부터는 배포할 때 PIN만 입력하면 됩니다.</p>
+            <p id="ghErr" class="hidden rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-300"></p>
+            <button type="button" id="ghSave" class="w-full rounded-xl bg-white/10 py-2.5 text-sm font-semibold text-white hover:bg-white/15">🔒 PIN으로 잠그고 연결</button>
+          </div>
+          <!-- 연결 완료 후 -->
+          <div id="ghLinked" class="mt-4 hidden space-y-3">
+            <div class="flex items-center gap-3 rounded-xl bg-emerald-500/10 px-3 py-3">
+              <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-emerald-500/20 text-emerald-300">✓</span>
+              <p class="text-xs leading-relaxed text-slate-300"><b id="ghLinkedUser" class="text-white"></b> 계정이 연결돼 있어요.<br />배포할 때 PIN만 입력하면 됩니다.</p>
+            </div>
+            <button type="button" id="ghClear" class="text-xs font-semibold text-slate-500 hover:text-red-300">연결 해제 (토큰 삭제)</button>
+          </div>
+        </details>
+      </form>
+
+      <div class="flex min-h-[520px] flex-col bg-ink-900/40 lg:min-h-0">
+        <div class="flex items-center justify-between border-b border-white/5 px-4 py-2.5">
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Preview</span>
+          <div class="flex gap-1 rounded-lg bg-white/[.04] p-0.5" role="group" aria-label="미리보기 크기">
+            <button type="button" data-pv="100%" aria-pressed="true" class="pvbtn">PC</button>
+            <button type="button" data-pv="390px" aria-pressed="false" class="pvbtn">모바일</button>
+          </div>
+        </div>
+        <div class="relative flex flex-1 justify-center overflow-hidden p-3 sm:p-4">
+          <iframe id="preview" title="사이트 미리보기" class="h-full w-full rounded-xl border border-white/10 bg-white transition-[width] duration-300"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-popups"></iframe>
+          <div id="pvEmpty" class="absolute inset-3 grid place-items-center rounded-xl border border-dashed border-white/10 bg-ink-950 text-sm text-slate-500 sm:inset-4">코드를 넣으면 여기에 표시돼요</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PIN 입력 ================= -->
+  <div id="pinModal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-black/70 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="pinTitle">
+    <form id="pinForm" class="w-full max-w-xs rounded-3xl border border-white/10 bg-ink-900 p-6 text-center shadow-2xl">
+      <span class="mx-auto grid h-12 w-12 place-items-center rounded-full bg-flame-500/15 text-flame-300">
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+      </span>
+      <h3 id="pinTitle" class="mt-4 text-base font-bold text-white">PIN 입력</h3>
+      <p class="mt-1 text-xs text-slate-400">GitHub에 배포하려면 PIN을 입력해 주세요</p>
+      <input id="pinInput" type="password" inputmode="numeric" maxlength="6" autocomplete="off" aria-label="PIN"
+        class="mt-5 w-full rounded-xl border border-white/10 bg-ink-950/70 py-3 text-center text-2xl tracking-[.5em] text-white focus:border-flame-400 focus:outline-none focus:ring-2 focus:ring-flame-500/25" />
+      <p id="pinErr" class="mt-2 min-h-[1rem] text-xs text-red-300"></p>
+      <div class="mt-3 flex gap-2">
+        <button type="button" id="pinCancel" class="flex-1 rounded-xl border border-white/10 py-2.5 text-sm font-semibold text-slate-300 hover:border-white/30">취소</button>
+        <button type="submit" id="pinOk" class="flex-1 rounded-xl bg-flame-500 py-2.5 text-sm font-bold text-ink-900 hover:bg-flame-400">확인</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ================= SITE VIEW (#/s/이름) ================= -->
+  <div id="siteView" class="fixed inset-0 z-[80] hidden bg-white">
+    <iframe id="siteFrame" title="사이트" class="h-full w-full border-0" sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-popups allow-downloads"></iframe>
+    <div id="siteBar" class="fixed bottom-4 left-1/2 z-10 flex -translate-x-1/2 items-center gap-0.5 rounded-full border border-white/10 bg-ink-900/90 p-1 text-xs font-semibold text-slate-200 shadow-2xl backdrop-blur">
+      <a href="#" class="rounded-full px-3 py-2 hover:bg-white/10">← Archive</a>
+      <span id="siteName" class="max-w-[120px] truncate px-2 text-flame-300"></span>
+      <button type="button" id="siteEdit" class="rounded-full px-3 py-2 hover:bg-white/10">편집</button>
+      <a id="siteNew" target="_blank" rel="noopener" class="rounded-full px-3 py-2 hover:bg-white/10">새 탭</a>
+      <button type="button" id="siteHide" class="grid h-8 w-8 place-items-center rounded-full text-slate-400 hover:bg-white/10 hover:text-white" aria-label="바 숨기기">
+        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <style>
+    .srctab, .pvbtn { border-radius:.6rem; padding:.5rem .75rem; font-size:.8125rem; font-weight:600; color:#94a3b8; transition:all .2s; }
+    .pvbtn { padding:.3rem .7rem; font-size:.75rem; border-radius:.45rem; }
+    .srctab[aria-selected="true"], .pvbtn[aria-pressed="true"] { background:#ff7a1a; color:#0b131f; }
+    #drop.drag { border-color:#ff9447; background:rgba(255,122,26,.06); }
+    #deployLog li { display:flex; gap:.5rem; align-items:flex-start; color:#cbd5e1; }
+    #deployLog li::before { content:''; flex:none; width:.9rem; height:.9rem; margin-top:.05rem; border-radius:9999px; border:2px solid #ff9447; border-right-color:transparent; animation:spin .8s linear infinite; }
+    #deployLog li[data-kind="ok"]::before { content:'✓'; border:0; animation:none; color:#34d399; font-weight:800; line-height:.9rem; }
+    #deployLog li[data-kind="err"] { color:#fca5a5; }
+    #deployLog li[data-kind="err"]::before { content:'✕'; border:0; animation:none; color:#f87171; font-weight:800; line-height:.9rem; }
+    #deployLog a { color:#ffb27a; text-decoration:underline; word-break:break-all; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    @keyframes shake { 20%,60% { transform:translateX(-6px); } 40%,80% { transform:translateX(6px); } }
+    .shake { animation:shake .35s; }
+    .site-chip[aria-current="true"] { border-color:#ff7a1a; color:#fff; background:rgba(255,122,26,.1); }
+  </style>
+
+  <script>
+    /* =========================================================
+       🛠 SITE STUDIO — 코드/파일로 나만의 사이트 만들기
+       · 저장: 이 브라우저(IndexedDB)에 보관 → 아카이브주소#/s/이름 으로 열림
+       · 배포: GitHub API로 저장소 생성 + index.html 업로드 + Pages 활성화
+       ========================================================= */
+    (() => {
+      const studio = $('#studio'), sf = $('#studioForm'), sErr = $('#studioError');
+      const preview = $('#preview'), pvEmpty = $('#pvEmpty'), logEl = $('#deployLog');
+      const siteView = $('#siteView'), siteFrame = $('#siteFrame');
+      const NAME_RE = /^[\p{L}\p{N}][\p{L}\p{N}._-]{0,59}$/u;     // 한글 포함 모든 글자
+      const REPO_RE = /^[A-Za-z0-9._-]{1,100}$/;                        // GitHub 저장소 규칙
+
+      /* 한글 → 로마자 (국어의 로마자 표기법 기본 규칙) */
+      const RR_L = ['g','kk','n','d','tt','r','m','b','pp','s','ss','','j','jj','ch','k','t','p','h'];
+      const RR_V = ['a','ae','ya','yae','eo','e','yeo','ye','o','wa','wae','oe','yo','u','wo','we','wi','yu','eu','ui','i'];
+      const RR_T = ['','k','k','k','n','n','n','t','l','k','m','l','l','l','p','l','m','p','p','t','t','ng','t','t','k','t','p','t'];
+      const romanize = (s) => s.replace(/[\uAC00-\uD7A3]/g, ch => {
+        const i = ch.charCodeAt(0) - 0xAC00;
+        return RR_L[Math.floor(i / 588)] + RR_V[Math.floor((i % 588) / 28)] + RR_T[i % 28];
+      });
+      const toRepo = (name) => romanize(name)
+        .replace(/[^A-Za-z0-9._-]+/g, '-').replace(/-{2,}/g, '-').replace(/^[-.]+|[-.]+$/g, '').slice(0, 100) || 'site';
+      const cleanName = (v) => v.replace(/\s+/g, '-').replace(/[^\p{L}\p{N}._-]/gu, '');
+      const GH_KEY = 'owens-archive:github';
+      const baseUrl = () => location.href.split('#')[0];
+      const localUrl = (n) => baseUrl() + '#/s/' + encodeURIComponent(n);
+      const pageTitle = document.title;
+      let loaded = null;          // 편집 중인 기존 사이트
+      let busy = false;
+
+      /* ---------- IndexedDB 저장소 ---------- */
+      let dbp;
+      const db = () => dbp ||= new Promise((res, rej) => {
+        const r = indexedDB.open('owens-archive', 1);
+        r.onupgradeneeded = () => r.result.createObjectStore('sites', { keyPath: 'name' });
+        r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+      });
+      const tx = async (mode, fn) => {
+        const d = await db();
+        return new Promise((res, rej) => {
+          const t = d.transaction('sites', mode), req = fn(t.objectStore('sites'));
+          t.oncomplete = () => res(req.result); t.onerror = () => rej(t.error);
+        });
+      };
+      window.__siteHtml = (n) => tx('readonly', s => s.get(n)).then(s => s?.html || null);
+      const Sites = {
+        get: (n) => tx('readonly', s => s.get(n)),
+        all: () => tx('readonly', s => s.getAll()),
+        put: (v) => tx('readwrite', s => s.put(v)),
+        del: (n) => tx('readwrite', s => s.delete(n)),
+      };
+
+      /* ---------- 사이트 보기 (라우터) ---------- */
+      let inFrame = true;
+      try { inFrame = window.self !== window.top; } catch {}
+      if (inFrame) $('#siteBar').remove();     // 카드 목업 안에서는 사이트만 보이게
+
+      async function openSite(name) {
+        siteView.classList.remove('hidden');
+        document.body.classList.add('modal-open');
+        let site = null;
+        try { site = await Sites.get(name); } catch {}
+        siteFrame.srcdoc = site ? site.html :
+          `<!doctype html><meta charset="utf-8"><body style="margin:0;display:grid;place-items:center;height:100vh;background:#070c14;color:#94a3b8;font-family:system-ui,sans-serif;text-align:center"><div><p style="font-size:48px;margin:0;color:#ff9447;font-weight:800">404</p><p>'${esc(name)}' 사이트가 이 브라우저에 없어요.</p></div>`;
+        document.title = site ? (site.title || site.name) : pageTitle;
+        if (!inFrame) {
+          $('#siteName').textContent = site ? (site.title || site.name) : name;
+          $('#siteNew').href = localUrl(name);
+          $('#siteEdit').hidden = !site;
+          $('#siteBar').classList.remove('hidden');
+        }
+      }
+      function closeSite() {
+        if (siteView.classList.contains('hidden')) return;
+        siteView.classList.add('hidden');
+        siteFrame.removeAttribute('srcdoc');
+        document.title = pageTitle;
+        document.body.classList.remove('modal-open');
+        if (window.__deferRefresh) { window.__deferRefresh = false; refresh(); }
+      }
+      function route() {
+        const m = location.hash.match(/^#\/s\/(.+)$/);
+        if (m) openSite(decodeURIComponent(m[1])); else closeSite();
+      }
+      window.addEventListener('hashchange', route);
+      route();
+      $('#siteHide')?.addEventListener('click', () => $('#siteBar').classList.add('hidden'));
+      $('#siteEdit')?.addEventListener('click', () => {
+        const n = decodeURIComponent(location.hash.replace(/^#\/s\//, ''));
+        history.pushState('', '', baseUrl()); closeSite(); openStudio(n);
+      });
+
+      /* ---------- 스튜디오 열기/닫기 ---------- */
+      sf.sSlot.innerHTML = SLOTS.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join('');
+      const syncCardOpts = () => {
+        $('#cardOpts').classList.toggle('hidden', !sf.addCard.checked);
+        sf.sSlot.classList.toggle('hidden', sf.sCategory.value !== '포트폴리오');
+        sf.sDesc.classList.toggle('col-span-2', true);
+        sf.sCategory.classList.toggle('col-span-2', sf.sCategory.value !== '포트폴리오');
+      };
+      sf.addCard.addEventListener('change', syncCardOpts);
+      sf.sCategory.addEventListener('change', syncCardOpts);
+
+      async function openStudio(name) {
+        studio.classList.remove('hidden'); studio.classList.add('flex');
+        document.body.classList.add('modal-open');
+        loadGh();
+        await renderSiteList();
+        if (name) { const s = await Sites.get(name).catch(() => null); if (s) return fill(s); }
+        fill(null);
+      }
+      function closeStudio() {
+        studio.classList.add('hidden'); studio.classList.remove('flex');
+        document.body.classList.remove('modal-open');
+        preview.removeAttribute('srcdoc');
+      }
+      $('#openStudio').addEventListener('click', () => openStudio());
+      studio.addEventListener('click', e => { if (e.target.closest('[data-studio-close]')) closeStudio(); });
+      document.addEventListener('keydown', e => { if (e.key === 'Escape' && !studio.classList.contains('hidden') && $('#pinModal').classList.contains('hidden')) closeStudio(); });
+      $('#newSite').addEventListener('click', () => { fill(null); renderSiteList(); });
+
+      function fill(s) {
+        loaded = s;
+        sErr.classList.add('hidden'); logEl.classList.add('hidden'); logEl.innerHTML = '';
+        sf.name.value = s?.name || '';
+        sf.repo.value = s?.repo || (s ? toRepo(s.name) : '');
+        sf.repo.dataset.touched = s?.repo ? '1' : '';
+        sf.title.value = s?.title || '';
+        sf.code.value = s?.html || '';
+        const card = s && custom.find(p => p.id === 'site-' + s.name);
+        sf.addCard.checked = s ? !!card : true;
+        sf.sCategory.value = card?.category || '포트폴리오';
+        sf.sSlot.value = card?.slot && SLOTS.includes(card.slot) ? card.slot : SLOTS[0];
+        sf.sDesc.value = card?.desc || '';
+        $('#fileList').innerHTML = '';
+        setTab('code'); syncCardOpts(); updatePreview();
+        renderSiteList();
+        setTimeout(() => (s ? sf.code : sf.name).focus(), 50);
+      }
+
+      async function renderSiteList() {
+        let list = [];
+        try { list = (await Sites.all()).sort((a, b) => b.updated - a.updated); } catch {}
+        $('#siteList').innerHTML = list.length ? list.map(s => `
+          <span class="site-chip inline-flex items-center rounded-full border border-white/10 text-xs text-slate-300" aria-current="${loaded?.name === s.name}">
+            <button type="button" data-load="${esc(s.name)}" class="py-1.5 pl-3 pr-1 hover:text-white">${esc(s.title || s.name)}${s.deployedUrl ? ' <span class="text-emerald-400">●</span>' : ''}</button>
+            <button type="button" data-del-site="${esc(s.name)}" class="grid h-6 w-6 place-items-center rounded-full text-slate-500 hover:text-red-300" aria-label="${esc(s.name)} 삭제">×</button>
+          </span>`).join('') : '<span class="text-xs text-slate-500">아직 만든 사이트가 없어요.</span>';
+      }
+      $('#siteList').addEventListener('click', async e => {
+        const ld = e.target.closest('[data-load]'), dl = e.target.closest('[data-del-site]');
+        if (ld) fill(await Sites.get(ld.dataset.load));
+        if (dl && confirm(`'${dl.dataset.delSite}' 사이트를 삭제할까요? (GitHub에 배포된 저장소는 그대로 남아요)`)) {
+          await Sites.del(dl.dataset.delSite);
+          custom = custom.filter(p => p.id !== 'site-' + dl.dataset.delSite); saveCustom(custom); refreshArchive();
+          if (loaded?.name === dl.dataset.delSite) fill(null); else renderSiteList();
+          toast('사이트를 삭제했어요');
+        }
+      });
+
+      /* ---------- 코드 입력 / 미리보기 ---------- */
+      let pvTimer;
+      function updatePreview() {
+        const code = sf.code.value;
+        $('#codeSize').textContent = (new Blob([code]).size / 1024).toFixed(1) + ' KB';
+        pvEmpty.classList.toggle('hidden', !!code.trim());
+        clearTimeout(pvTimer);
+        pvTimer = setTimeout(() => { preview.srcdoc = code; }, 350);
+      }
+      sf.code.addEventListener('input', updatePreview);
+      sf.code.addEventListener('keydown', e => {
+        if (e.key !== 'Tab') return;
+        e.preventDefault();
+        const { selectionStart: a, selectionEnd: b, value: v } = sf.code;
+        sf.code.value = v.slice(0, a) + '  ' + v.slice(b);
+        sf.code.selectionStart = sf.code.selectionEnd = a + 2;
+        updatePreview();
+      });
+      document.querySelectorAll('[data-pv]').forEach(b => b.addEventListener('click', () => {
+        document.querySelectorAll('[data-pv]').forEach(x => x.setAttribute('aria-pressed', x === b));
+        preview.style.width = b.dataset.pv;
+      }));
+      // 이름 자동 정리 (공백 → 하이픈) — 한글 조합 중에는 건드리지 않음
+      function onName(e) {
+        $('#nameBox').classList.remove('!border-red-400');
+        if (!e.isComposing && e.type !== 'compositionupdate') {
+          const v = cleanName(sf.name.value);
+          if (v !== sf.name.value) sf.name.value = v;
+        }
+        if (!sf.repo.dataset.touched) sf.repo.value = sf.name.value ? toRepo(cleanName(sf.name.value)) : '';
+      }
+      sf.name.addEventListener('input', onName);
+      sf.name.addEventListener('compositionend', onName);
+      sf.repo.addEventListener('input', () => {
+        const v = sf.repo.value.replace(/\s+/g, '-').replace(/[^A-Za-z0-9._-]/g, '');
+        if (v !== sf.repo.value) sf.repo.value = v;
+        sf.repo.dataset.touched = sf.repo.value ? '1' : '';
+        $('#repoBox').classList.remove('!border-red-400');
+      });
+
+      function setTab(t) {
+        document.querySelectorAll('[data-src-tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.srcTab === t));
+        document.querySelectorAll('[data-src-panel]').forEach(p => p.classList.toggle('hidden', p.dataset.srcPanel !== t));
+      }
+      document.querySelectorAll('[data-src-tab]').forEach(b => b.addEventListener('click', () => setTab(b.dataset.srcTab)));
+
+      /* ---------- 파일 업로드 → 한 파일로 합치기 ---------- */
+      const reAsset = (n) => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const readText = (f) => f.text();
+      const readData = (f) => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(f); });
+
+      async function handleFiles(fileList) {
+        const files = [...fileList];
+        const html = files.find(f => /^index\.html?$/i.test(f.name)) || files.find(f => /\.html?$/i.test(f.name));
+        if (!html) return showErr('HTML 파일(index.html)이 필요해요.');
+        let out = await readText(html);
+        const report = [`<li class="text-emerald-300">✓ ${esc(html.name)} (메인)</li>`];
+        const path = (n) => `(?:\\./)?(?:[\\w.-]+/)*${reAsset(n)}`;
+        for (const f of files) {
+          if (f === html) continue;
+          let used = false;
+          if (/\.css$/i.test(f.name)) {
+            const css = await readText(f);
+            out = out.replace(new RegExp(`<link[^>]*href=["']${path(f.name)}["'][^>]*>`, 'gi'), () => { used = true; return `<style>\n${css}\n</style>`; });
+          } else if (/\.js$/i.test(f.name)) {
+            const js = (await readText(f)).replace(/<\/script/gi, '<\\/script');
+            out = out.replace(new RegExp(`<script([^>]*?)\\ssrc=["']${path(f.name)}["']([^>]*)>\\s*<\/script>`, 'gi'), (m, a, b) => { used = true; return `<script${a}${b}>\n${js}\n<\/script>`; });
+          } else if (f.type.startsWith('image/')) {
+            const data = await readData(f);
+            out = out.replace(new RegExp(`(["'(])${path(f.name)}(["')])`, 'g'), (m, a, b) => { used = true; return a + data + b; });
+          }
+          report.push(used ? `<li class="text-emerald-300">✓ ${esc(f.name)} 합침</li>` : `<li class="text-slate-500">– ${esc(f.name)} (HTML에서 참조를 못 찾음)</li>`);
+        }
+        sf.code.value = out;
+        if (!sf.name.value) sf.name.value = html.name.replace(/\.html?$/i, '') === 'index' ? '' : cleanName(html.name.replace(/\.html?$/i, ''));
+        if (!sf.repo.dataset.touched) sf.repo.value = sf.name.value ? toRepo(sf.name.value) : '';
+        $('#fileList').innerHTML = report.join('');
+        sErr.classList.add('hidden');
+        updatePreview();
+        toast('파일을 불러왔어요 · 코드 탭에서 수정할 수 있어요');
+      }
+      const drop = $('#drop');
+      $('#fileInput').addEventListener('change', e => { if (e.target.files.length) handleFiles(e.target.files); e.target.value = ''; });
+      ['dragenter', 'dragover'].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.add('drag'); }));
+      ['dragleave', 'drop'].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.remove('drag'); }));
+      drop.addEventListener('drop', e => { if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files); });
+
+      /* ---------- 저장 ---------- */
+      function showErr(msg) { sErr.textContent = msg; sErr.classList.remove('hidden'); }
+      function validate() {
+        sErr.classList.add('hidden');
+        const name = sf.name.value.trim();
+        if (!NAME_RE.test(name)) { $('#nameBox').classList.add('!border-red-400'); sf.name.focus(); showErr('사이트 이름을 입력해 주세요. (한글·영문·숫자·하이픈 사용 가능)'); return null; }
+        if (!sf.code.value.trim()) { setTab('code'); sf.code.focus(); showErr('코드를 붙여넣거나 index.html을 올려 주세요.'); return null; }
+        return name;
+      }
+      async function saveSite(name, extra = {}) {
+        const prev = await Sites.get(name).catch(() => null);
+        if (prev && loaded?.name !== name && !extra.silent && !confirm(`'${name}' 이름의 사이트가 이미 있어요. 덮어쓸까요?`)) return null;
+        delete extra.silent;
+        const site = { ...(prev || {}), name, title: sf.title.value.trim(), repo: sf.repo.value.trim() || toRepo(name), html: sf.code.value, updated: Date.now(), ...extra };
+        await Sites.put(site);
+        // 이름을 바꿔 저장하면 예전 사이트 카드는 새 이름으로 교체
+        if (loaded && loaded.name !== name) custom = custom.filter(p => p.id !== 'site-' + loaded.name);
+        loaded = site;
+        upsertCard(site);
+        renderSiteList();
+        return site;
+      }
+      function upsertCard(site) {
+        const id = 'site-' + site.name;
+        if (!sf.addCard.checked) { custom = custom.filter(p => p.id !== id); saveCustom(custom); return refreshArchive(); }
+        const prev = custom.find(p => p.id === id);
+        const cat = sf.sCategory.value;
+        const project = {
+          id, title: site.title || site.name, category: cat, slot: cat === '포트폴리오' ? sf.sSlot.value : '',
+          desc: sf.sDesc.value.trim() || 'Site Studio에서 직접 만든 사이트입니다.',
+          tags: prev?.tags?.length ? prev.tags : ['HTML', 'Site Studio'],
+          live: site.deployedUrl || localUrl(site.name),
+          source: site.deployedRepo ? `https://github.com/${site.deployedRepo}` : '',
+          accent: prev?.accent || PALETTES[0], year: prev?.year || new Date().getFullYear(),
+        };
+        custom = prev ? custom.map(p => p.id === id ? project : p) : [project, ...custom];
+        saveCustom(custom); refreshArchive();
+      }
+      function refreshArchive() {
+        if (!siteView.classList.contains('hidden') || window.__deferRefresh) window.__deferRefresh = true; else refresh();
+      }
+
+      sf.addEventListener('submit', async e => {
+        e.preventDefault();
+        const name = validate(); if (!name) return;
+        try {
+          const site = await saveSite(name); if (!site) return;
+          closeStudio(); toast('저장했어요 · 나만의 사이트로 열어요');
+          location.hash = '#/s/' + encodeURIComponent(name);
+        } catch (err) { showErr('이 브라우저에서 저장할 수 없어요. (시크릿 모드 등) ' + (err?.message || '')); }
+      });
+
+      /* ---------- GitHub Pages 배포 ---------- */
+      const getGh = () => { try { return JSON.parse(localStorage.getItem(GH_KEY)) || {}; } catch { return {}; } };
+      let sessionToken = null;   // PIN으로 한 번 풀면 페이지를 닫을 때까지 기억
+
+      /* 토큰 암호화 (PIN → PBKDF2 → AES-GCM) */
+      const te = new TextEncoder();
+      const toB = (u8) => btoa(String.fromCharCode(...u8));
+      const fromB = (s) => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+      async function pinKey(pin, salt) {
+        const base = await crypto.subtle.importKey('raw', te.encode(pin), 'PBKDF2', false, ['deriveKey']);
+        return crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: 310000, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+      }
+      async function lockToken(token, pin) {
+        const salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
+        const data = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, await pinKey(pin, salt), te.encode(token)));
+        return { salt: toB(salt), iv: toB(iv), data: toB(data) };
+      }
+      async function unlockToken(box, pin) {
+        const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: fromB(box.iv) }, await pinKey(pin, fromB(box.salt)), fromB(box.data));
+        return new TextDecoder().decode(pt);
+      }
+
+      function loadGh() {
+        const g = getGh(), linked = !!g.box;
+        sf.ghUser.value = g.user || sf.ghUser.value || 'jake12733';
+        $('#repoPrefix').textContent = sf.ghUser.value + '.github.io/';
+        if (g.token && !sf.ghToken.value) sf.ghToken.value = g.token;     // 예전 방식으로 저장된 토큰 → PIN 설정 유도
+        $('#ghSetup').classList.toggle('hidden', linked);
+        $('#ghLinked').classList.toggle('hidden', !linked);
+        $('#ghLinkedUser').textContent = g.user || '';
+        $('#ghState').textContent = linked ? '● 연결됨 · PIN 잠금' : (g.token ? 'PIN 설정 필요' : '미설정');
+        $('#ghState').className = 'text-xs font-medium ' + (linked ? 'text-emerald-400' : g.token ? 'text-flame-300' : 'text-slate-500');
+      }
+      const ghErr = (m) => { const el = $('#ghErr'); el.textContent = m; el.classList.toggle('hidden', !m); };
+
+      $('#ghSave').addEventListener('click', async () => {
+        const user = sf.ghUser.value.trim(), token = sf.ghToken.value.trim(), pin = sf.ghPin.value, pin2 = sf.ghPin2.value;
+        if (!/^[A-Za-z0-9-]+$/.test(user)) return ghErr('GitHub 사용자명을 확인해 주세요.');
+        if (!/^(github_pat_|ghp_)\S{20,}$/.test(token)) return ghErr('토큰이 올바르지 않아요. github_pat_ 으로 시작하는 코드를 붙여넣어 주세요.');
+        if (!/^\d{4,6}$/.test(pin)) return ghErr('PIN은 숫자 4~6자리로 정해 주세요.');
+        if (pin !== pin2) return ghErr('PIN 확인이 일치하지 않아요.');
+        if (!crypto?.subtle) return ghErr('이 브라우저에서는 암호화를 쓸 수 없어요. https 주소에서 열어 주세요.');
+        try {
+          const box = await lockToken(token, pin);
+          localStorage.setItem(GH_KEY, JSON.stringify({ user, box }));
+          sessionToken = token;
+          sf.ghToken.value = sf.ghPin.value = sf.ghPin2.value = '';
+          ghErr(''); loadGh(); toast('PIN으로 잠그고 GitHub에 연결했어요');
+        } catch { ghErr('이 브라우저에 저장할 수 없어요.'); }
+      });
+      $('#ghClear').addEventListener('click', () => {
+        if (!confirm('GitHub 연결을 해제할까요?\n다시 배포하려면 토큰을 새로 붙여넣어야 해요.')) return;
+        try { localStorage.removeItem(GH_KEY); } catch {}
+        sessionToken = null; sf.ghToken.value = ''; loadGh(); toast('연결을 해제했어요');
+      });
+      sf.ghPin.addEventListener('input', () => sf.ghPin.value = sf.ghPin.value.replace(/\D/g, ''));
+      sf.ghPin2.addEventListener('input', () => sf.ghPin2.value = sf.ghPin2.value.replace(/\D/g, ''));
+
+      /* PIN 입력창 — 맞으면 토큰을 돌려줌, 취소하면 null */
+      const pinModal = $('#pinModal'), pinInput = $('#pinInput'), pinErr = $('#pinErr');
+      let pinFails = 0, pinLockedUntil = 0;
+      function askPin(box) {
+        return new Promise(resolve => {
+          pinInput.value = ''; pinErr.textContent = '';
+          pinModal.classList.remove('hidden'); pinModal.classList.add('flex');
+          setTimeout(() => pinInput.focus(), 50);
+          const finish = (v) => {
+            pinModal.classList.add('hidden'); pinModal.classList.remove('flex');
+            $('#pinForm').onsubmit = $('#pinCancel').onclick = pinModal.onkeydown = null;
+            resolve(v);
+          };
+          $('#pinCancel').onclick = () => finish(null);
+          pinModal.onkeydown = (e) => { if (e.key === 'Escape') { e.stopPropagation(); finish(null); } };
+          $('#pinForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const wait = Math.ceil((pinLockedUntil - Date.now()) / 1000);
+            if (wait > 0) { pinErr.textContent = `${wait}초 뒤에 다시 시도해 주세요.`; return; }
+            $('#pinOk').disabled = true;
+            try {
+              const token = await unlockToken(box, pinInput.value);
+              pinFails = 0; finish(token);
+            } catch {
+              pinFails++;
+              if (pinFails >= 5) { pinLockedUntil = Date.now() + 30000; pinFails = 0; pinErr.textContent = 'PIN을 5번 틀렸어요. 30초 뒤에 다시 시도해 주세요.'; }
+              else pinErr.textContent = `PIN이 맞지 않아요 (${pinFails}/5)`;
+              pinInput.value = ''; pinInput.focus();
+              $('#pinForm').classList.remove('shake'); void $('#pinForm').offsetWidth; $('#pinForm').classList.add('shake');
+            } finally { $('#pinOk').disabled = false; }
+          };
+        });
+      }
+      pinInput.addEventListener('input', () => {
+        pinInput.value = pinInput.value.replace(/\D/g, '');
+        if (pinInput.value.length === 6) $('#pinForm').requestSubmit();   // 6자리면 자동 확인
+      });
+
+      function log(msg, kind = 'run') {
+        logEl.classList.remove('hidden');
+        const li = document.createElement('li'); li.dataset.kind = kind; li.innerHTML = `<span>${msg}</span>`;
+        logEl.appendChild(li); return li;
+      }
+      const done = (li, msg) => { li.dataset.kind = 'ok'; if (msg) li.querySelector('span').innerHTML = msg; };
+      const b64 = (str) => {
+        const bytes = new TextEncoder().encode(str); let bin = '';
+        for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+        return btoa(bin);
+      };
+      async function ghError(r) {
+        let m = ''; try { m = (await r.json()).message || ''; } catch {}
+        if (r.status === 401) { sessionToken = null; return new Error('토큰이 만료됐거나 올바르지 않아요. 연결을 해제하고 새 토큰을 등록해 주세요.'); }
+        if (r.status === 403) return new Error(`토큰 권한이 부족해요. GitHub 토큰 설정에서 Repository access를 'All repositories'로, Administration · Contents · Pages를 'Read and write'로 바꿔 주세요.${m ? ` (GitHub: ${m})` : ''}`);
+        return new Error(`GitHub 오류 (${r.status}) ${m}`);
+      }
+
+      $('#deployBtn').addEventListener('click', async () => {
+        if (busy) return;
+        const name = validate(); if (!name) return;
+        if (!sf.repo.value.trim()) sf.repo.value = toRepo(name);
+        const repoName = sf.repo.value.trim();
+        if (!REPO_RE.test(repoName) || /^\.+$/.test(repoName)) {
+          $('#repoBox').classList.add('!border-red-400'); sf.repo.focus();
+          return showErr('GitHub 배포 주소는 영문·숫자·하이픈(-)으로 입력해 주세요.');
+        }
+        const g = getGh(), user = g.user;
+        if (!g.box || !user) {
+          $('#ghBox').open = true; sf.ghToken.focus();
+          return showErr('처음 한 번만 GitHub 연결 설정에서 토큰과 PIN을 등록해 주세요.');
+        }
+        let token = sessionToken;
+        if (!token) { token = await askPin(g.box); if (!token) return; sessionToken = token; }
+
+        const api = (path, opt = {}) => fetch('https://api.github.com' + path, {
+          ...opt, headers: { Accept: 'application/vnd.github+json', Authorization: `Bearer ${token}`, 'X-GitHub-Api-Version': '2022-11-28', ...(opt.body ? { 'Content-Type': 'application/json' } : {}) },
+        });
+        const repoPath = `/repos/${encodeURIComponent(user)}/${encodeURIComponent(repoName)}`;
+        busy = true; $('#deployBtn').disabled = true; $('#deployBtn').classList.add('opacity-60');
+        logEl.innerHTML = '';
+        let step;
+        try {
+          const prevSite = await Sites.get(name).catch(() => null);
+          step = log('저장소 확인 중…');
+          let r = await api(repoPath), repo;
+          if (r.status === 404) {
+            step.querySelector('span').textContent = `저장소 ${user}/${repoName} 만드는 중…`;
+            r = await api('/user/repos', { method: 'POST', body: JSON.stringify({ name: repoName, description: sf.title.value.trim() || `${name} — made with Owen's Archive`, auto_init: true, private: false }) });
+            if (!r.ok) throw await ghError(r);
+            repo = await r.json(); await new Promise(res => setTimeout(res, 1500));
+            done(step, `저장소 생성: ${esc(user)}/${esc(repoName)}`);
+          } else if (r.ok) {
+            repo = await r.json();
+            if (prevSite?.deployedRepo !== `${user}/${repoName}` &&
+                !confirm(`GitHub에 '${user}/${repoName}' 저장소가 이미 있어요.\nindex.html을 지금 코드로 덮어쓸까요?`)) throw new Error('배포를 취소했어요.');
+            done(step, `기존 저장소 사용: ${esc(user)}/${esc(repoName)}`);
+          } else throw await ghError(r);
+
+          const branch = repo.default_branch || 'main';
+          step = log('index.html 업로드 중…');
+          let sha;
+          r = await api(`${repoPath}/contents/index.html?ref=${encodeURIComponent(branch)}`);
+          if (r.ok) sha = (await r.json()).sha;
+          r = await api(`${repoPath}/contents/index.html`, { method: 'PUT', body: JSON.stringify({
+            message: sha ? 'Update site via Site Studio' : 'Add site via Site Studio', content: b64(sf.code.value), branch, ...(sha ? { sha } : {}) }) });
+          if (!r.ok) throw await ghError(r);
+          done(step, `index.html ${sha ? '업데이트' : '업로드'} 완료`);
+
+          step = log('GitHub Pages 켜는 중…');
+          r = await api(`${repoPath}/pages`);
+          let pages = r.ok ? await r.json() : null;
+          if (r.status === 404) {
+            r = await api(`${repoPath}/pages`, { method: 'POST', body: JSON.stringify({ build_type: 'legacy', source: { branch, path: '/' } }) });
+            if (!r.ok && r.status !== 409) throw await ghError(r);
+            pages = r.ok ? await r.json() : null;
+          } else if (!r.ok) throw await ghError(r);
+          const url = pages?.html_url || `https://${user.toLowerCase()}.github.io/${repoName}/`;
+          done(step, 'GitHub Pages 활성화');
+
+          await saveSite(name, { deployedUrl: url, deployedRepo: `${user}/${repoName}`, deployedAt: Date.now(), silent: true });
+          log(`배포 완료! 1~2분 뒤 열려요 → <a href="${esc(url)}" target="_blank" rel="noopener">${esc(url)}</a>`, 'ok');
+          toast('GitHub Pages에 배포했어요');
+        } catch (err) {
+          if (step && step.dataset.kind === 'run') step.dataset.kind = 'err';
+          log(esc(err?.message === 'Failed to fetch' ? 'GitHub에 연결할 수 없어요. 네트워크를 확인해 주세요.' : (err?.message || '배포 중 오류가 났어요.')), 'err');
+        } finally {
+          busy = false; $('#deployBtn').disabled = false; $('#deployBtn').classList.remove('opacity-60');
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
