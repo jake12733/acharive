@@ -369,6 +369,14 @@
         accent: ['#a78bfa', '#1e1b4b'], year: 2026,
       },
       {
+        title: '명진건설',
+        category: '포트폴리오', slot: '건설·인테리어',
+        desc: '종합건설사 시공 플랫폼. 예상 공사비 자동 견적, 준공 레퍼런스 DB, 영업·현장을 한 화면에서 보는 사내 관리 콘솔까지 갖춘 웹 솔루션입니다.',
+        tags: ['HTML', 'Tailwind', 'JavaScript', '견적 자동화'],
+        live: 'https://jake12733.github.io/myeongjingeonseol/', source: 'https://github.com/jake12733/myeongjingeonseol',
+        accent: ['#d4af37', '#0a0a0b'], year: 2026,
+      },
+      {
         title: '결 (Gyeol)',
         category: '포트폴리오', slot: '건설·인테리어',
         desc: '인테리어 스튜디오 브랜드 사이트. 여백과 에디토리얼 타이포로 스튜디오의 결을 표현했습니다.',
@@ -441,7 +449,13 @@
     const CATS = ['포트폴리오', '사회기업', '관리'];
     let custom = loadCustom().map(p => CATS.includes(p.category) ? p : { ...p, category: '포트폴리오' });
     const SELF_URL = location.href.split('#')[0].split('?')[0];
-    const all = () => [...custom, ...PROJECTS.map(p => p.live === 'self' ? { ...p, live: SELF_URL } : p)];
+    const norm = (u) => (u || '').toLowerCase().replace(/\/+$/, '');
+    // Site Studio로 만든 카드가 기본 목록에도 들어가 있으면(같은 주소) 한 번만 보이게
+    const all = () => {
+      const base = PROJECTS.map(p => p.live === 'self' ? { ...p, live: SELF_URL } : p);
+      const known = new Set(base.map(p => norm(p.live)).filter(Boolean));
+      return [...custom.filter(p => !known.has(norm(p.live))), ...base];
+    };
 
     /* ================= 렌더링 로직 ================= */
     const $ = (s) => document.querySelector(s);
